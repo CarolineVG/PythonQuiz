@@ -1,6 +1,8 @@
+import sqlite3
 from tkinter import *
 
-# quiz app
+
+# class QuizApp
 class QuizApp(Tk):
     def __init__(self):
         Tk.__init__(self)
@@ -13,6 +15,48 @@ class QuizApp(Tk):
             self._frame.destroy()
         self._frame = new_frame
         self._frame.pack()
+
+# class Database
+# NOG DB ID TOEVOEGEN AS PRIMARY KEY
+class Database():
+
+    def __init__(self):
+        self.conn = sqlite3.connect("Quiz.db")
+        self.cursor = self.conn.cursor()
+        self.conn.execute('CREATE TABLE IF NOT EXISTS Questions(Question TEXT, CorrectAnswer TEXT, WrongAnswerOne TEXT, WrongAnswerTwo TEXT, WrongAnswerThree TEXT)')
+        self.conn.commit()
+
+    def closeConnection(self):
+        self.conn.close()
+
+    # get data: DOESNT WORK
+    def getData(self):
+        # self.conn = sqlite3.connect("Quiz.db")
+        # with self.conn:
+        #     self.cursor = self.conn.cursor()
+        #
+        self.conn.execute('SELECT * FROM Questions')
+        self.conn.commit()
+        records = self.cursor.fetchall()
+        print(f'data from db: {records}')
+        return records
+
+    # insert data
+    def insertData(self, question, correctAnswer, wrongAnswerOne, wrongAnswerTwo, wrongAnswerThree):
+        self.conn.execute('INSERT INTO Questions(Question, CorrectAnswer, WrongAnswerOne, WrongAnswerTwo, WrongAnswerThree) VALUES(?,?,?,?,?)', (question, correctAnswer, wrongAnswerOne, wrongAnswerTwo, wrongAnswerThree))
+        self.conn.commit()
+
+        # this does work!
+        self.cursor.execute('SELECT * FROM Questions')
+        records = self.cursor.fetchall()
+        print(f'after db - {records}')
+
+
+# class Quiz
+# to do ...
+
+# class Question
+# to do ...
 
 # screen HOME
 class HomeScreen(Frame):
@@ -42,7 +86,24 @@ class CreateQuizScreen(Frame):
             a1 = answer1Value.get()
             a2 = answer2Value.get()
             a3 = answer3Value.get()
-            print(f'{q} ? {a1}, {a2}, {a3}')
+            a4 = answer4Value.get()
+            print(f'{q} ? {a1}, {a2}, {a3}, {a4}')
+
+            # add to db
+            db = Database()
+            db.insertData(q, a1, a2, a3, a4)
+            #db.getData()
+
+            conn = sqlite3.connect("Quiz.db")
+            with conn:
+                cursor = conn.cursor()
+
+            conn.execute('SELECT * FROM Questions')
+            conn.commit()
+            records = cursor.fetchall()
+            print(f'data from db: {records}')
+
+
 
         questionValue = StringVar()
         answer1Value = StringVar()
