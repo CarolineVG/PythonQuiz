@@ -31,15 +31,10 @@ class Database():
 
     # get data: DOESNT WORK
     def getData(self):
-        # self.conn = sqlite3.connect("Quiz.db")
-        # with self.conn:
-        #     self.cursor = self.conn.cursor()
-        #
-        self.conn.execute('SELECT * FROM Questions')
-        self.conn.commit()
+        self.cursor.execute('SELECT * FROM Questions')
         records = self.cursor.fetchall()
         print(f'data from db: {records}')
-        return records
+        self.conn.commit()
 
     # insert data
     def insertData(self, question, correctAnswer, wrongAnswerOne, wrongAnswerTwo, wrongAnswerThree):
@@ -92,16 +87,12 @@ class CreateQuizScreen(Frame):
             # add to db
             db = Database()
             db.insertData(q, a1, a2, a3, a4)
-            #db.getData()
+            db.getData()
 
             conn = sqlite3.connect("Quiz.db")
             with conn:
                 cursor = conn.cursor()
 
-            conn.execute('SELECT * FROM Questions')
-            conn.commit()
-            records = cursor.fetchall()
-            print(f'data from db: {records}')
 
 
 
