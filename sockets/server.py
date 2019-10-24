@@ -5,8 +5,9 @@ import json
 import threading
 
 HEADERSIZE = 10
-
-scores = []
+clients = set()
+answers = 0
+scores = {}
 
 def sendQuestion(clientsocket, address, question, solution):
     print("sending question...")
@@ -16,7 +17,7 @@ def sendQuestion(clientsocket, address, question, solution):
     
     msg = bytes(f'{len(msg):<{HEADERSIZE}}', "utf-8") + msg
 
-    #print(f"bytes msg = {msg}")
+    #print(msg)
     
     clientsocket.send(msg)
 
@@ -34,20 +35,28 @@ def sendQuestion(clientsocket, address, question, solution):
         if len(full_answer)-HEADERSIZE == answerlen:
             answer = pickle.loads(full_answer[HEADERSIZE:])
             answer = json.loads(answer)
-            print("The answer is: "+answer["answer"])
+            #print("The answer is: "+answer["answer"])
+            
+            global answers
+            answers = answers + 1
 
             #check if the answer was correct
             if answer["answer"] == solution:
                 #check if client is already in the scores
                 if answer["sender"] in scores:
-                    print("tijdelijk")
-                    #scores[answer["sender"]] = scores.get(answer["sender"]) + 1
+                    scores[answer["sender"]] = scores.get(answer["sender"]) + 1
                 else:
-                    scores.append([answer["sender"], 1])
-            top5 = '{"type":"top5", "scoreboard":"'+str(scores)+'"}'
-            top5 = pickle.dumps(top5)
-            top5 = bytes(f'{len(top5):<{HEADERSIZE}}', "utf-8") + top5
-            clientsocket.sendall(top5)
+                    scores[answer["sender"]] = 1
+            elif answer["sender"] not in scores:
+                scores[answer["sender"]] = 0
+
+            if answers == len(clients):
+                scoreboard = '{"type":"scores", "scoreboard":'+json.dumps(scores)+'}'
+                scoreboard = pickle.dumps(scoreboard)
+                scoreboard = bytes(f'{len(scoreboard):<{HEADERSIZE}}', "utf-8") + scoreboard
+                #print(scoreboard)
+                for c in clients:
+                    c.sendall(scoreboard)
 
 def connect():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -57,6 +66,9 @@ def connect():
         #connect
         clientsocket, address = s.accept()
         print(f"Connection from {address} has been established!")
+        
+        global clients
+        clients.add(clientsocket)
 
         x = threading.Thread(target=sendQuestion, args=(clientsocket, address, '{"type":"question", "sender": "Host", "id": "0001", "question": "What is the first letter of the alphabet?", "options":{"A":"A","B":"B","C":"C"}}', 'A'))
         x.start()

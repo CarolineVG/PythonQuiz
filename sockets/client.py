@@ -7,6 +7,8 @@ HEADERSIZE = 10
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((socket.gethostname(), 1236))
 
+yourScore = 0
+
 clientName = input("who are you? ")
 while True:
 
@@ -26,7 +28,7 @@ while True:
             d = pickle.loads(full_msg[HEADERSIZE:])
             message = json.loads(d)
 
-            print(message)
+            #print(message)
             
             if message["type"] == "question":
                 print(message['question'])
@@ -53,8 +55,32 @@ while True:
                 s.sendall(answer)
                 print("Waiting for others to answer...")
 
-            if message["type"] == "top5":
-                print("We got the scores!")
+            if message["type"] == "scores":
+
+                #print(message["scoreboard"])
+
+                # get users score from dictionary and print it
+                yourScore = message["scoreboard"].get(clientName)
+                print(f"Your current score is {yourScore}")
+
+                #dictionary to list so it can be sorted
+                top5 = []
+                for record in message["scoreboard"]:
+                    top5.append([record, message["scoreboard"][record]])
+                top5.sort(key=lambda x: x[1], reverse=True)
+
+
+                #print top 5
+                
+                print(f" - 1: {top5[0][1]} - {top5[0][0]}")
+                if len(top5) >= 2:
+                    print(f" - 2: {top5[1][1]} - {top5[1][0]}")
+                if len(top5) >= 3:
+                    print(f" - 3: {top5[2][1]} - {top5[2][0]}")
+                if len(top5) >= 4:
+                    print(f" - 4: {top5[3][1]} - {top5[3][0]}")
+                if len(top5) >= 5:
+                    print(f" - 5: {top5[4][1]} - {top5[4][0]}")
 
             #reset loop
             new_msg = True
