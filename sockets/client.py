@@ -9,6 +9,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((socket.gethostname(), 1236))
 
 clientName = input("who are you? ")
+print("Waiting for the quiz host to send the first question.")
 
 full_msg = b''
 new_msg = True

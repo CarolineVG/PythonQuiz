@@ -73,7 +73,7 @@ def sendToAll(json):
         c.sendall(json)
         #print(f"sending to {c}")
 
-def sendQuestion(clientsocket, address, question):
+def sendQuestion(clientsocket, question):
 
     solution = question['solution']
     question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+'}'
@@ -89,7 +89,6 @@ def sendQuestion(clientsocket, address, question):
     #print(msg)
     
     clientsocket.send(msg)
-    print(f"send a new question to {address}")
 
     #await response
     full_answer = b''
@@ -122,42 +121,47 @@ def sendQuestion(clientsocket, address, question):
             if answers == len(clients):
                 scoreboard = '{"type":"scores", "scoreboard":'+json.dumps(scores)+'}'
                 sendToAll(scoreboard)
-                print("scores have been send")
-                answers = 0
                 global currentQuestion
+                print(f"All players answered question {currentQuestion+1}")
+                answers = 0
                 currentQuestion = currentQuestion + 1
             return
 
-def handleQuiz(clientsocket, address, questions):
+def handleQuiz(clientsocket, questions):
     position = currentQuestion
-    sendQuestion(clientsocket, address, questions[0])
     while True:
-        if position < currentQuestion:
-            position = position + 1
+        if position == currentQuestion:
             time.sleep(1)
             if position != len(questions):
-                sendQuestion(clientsocket, address, questions[position])
+                sendQuestion(clientsocket, questions[position])
             else:
                 break
+            position = position + 1
     endMsg = pickle.dumps('{"type":"end", "message":"Thank you for playing!"}') #this message could be a custom variable
     endMsg = bytes(f'{len(endMsg):<{HEADERSIZE}}', "utf-8") + endMsg
     clientsocket.send(endMsg)
     return
 
-def startQuiz():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((socket.gethostname(), 1236))
-    s.listen(5)
+def connect():
     while True:
-        print("listening for new players")
-        #connect
-        clientsocket, address = s.accept()
-        print(f"Connection from {address} has been established!")
+        if closed:
+            break
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind((socket.gethostname(), 1236))
+        s.listen(5)
         
-        global clients
+        clientsocket, address = s.accept()
         clients.add(clientsocket)
+        print(f"{len(clients)} players have connected.")
 
-        x = threading.Thread(target=handleQuiz, args=(clientsocket, address, questions))
-        x.start()
 
-startQuiz()
+closed = False
+a = threading.Thread(target=connect)
+a.start()
+when = input("Listening for players...\nPress enter when enough players have joined.\n\n")
+if when != None:
+    closed = True
+    print("The quiz has started!")
+for c in clients:
+    x = threading.Thread(target=handleQuiz, args=(c, questions))
+    x.start()
