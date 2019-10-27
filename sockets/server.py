@@ -4,6 +4,7 @@ import random
 import json
 import threading
 import time
+import sys
 
 HEADERSIZE = 10 #size of the header of the data we send to the client. In the header we say how long the data is.
 clients = set() #a set of all clients that are connected
@@ -73,11 +74,18 @@ def sendToAll(json):
         c.sendall(json)
         #print(f"sending to {c}")
 
+def sortScores(scores):
+    top5 = []
+    for record in scores:
+        top5.append([record, scores[record]])
+    top5.sort(key=lambda x: x[1], reverse=True)
+    return top5
+
 def sendQuestion(clientsocket, question):
 
     solution = question['solution']
     question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+'}'
-
+        
     #print(question)
     #print(solution)
     
@@ -119,10 +127,30 @@ def sendQuestion(clientsocket, question):
             elif answer["sender"] not in scores:
                 scores[answer["sender"]] = 0
             if answers == len(clients):
-                scoreboard = '{"type":"scores", "scoreboard":'+json.dumps(scores)+'}'
-                sendToAll(scoreboard)
+                global questions
                 global currentQuestion
+                if currentQuestion == len(questions)-1:
+                    scoreboard = '{"type":"scores", "scoreboard":'+json.dumps(scores)+',"endMessage":"Thank you for playing!"}'
+                else:
+                    scoreboard = '{"type":"scores", "scoreboard":'+json.dumps(scores)+'}'
+                sendToAll(scoreboard)
                 print(f"All players answered question {currentQuestion+1}")
+
+                top5 = sortScores(scores)
+
+                print("")
+                print("Current scoreboard:")
+                print(f" - 1: {top5[0][1]} - {top5[0][0]}")
+                if len(top5) >= 2:
+                    print(f" - 2: {top5[1][1]} - {top5[1][0]}")
+                if len(top5) >= 3:
+                    print(f" - 3: {top5[2][1]} - {top5[2][0]}")
+                if len(top5) >= 4:
+                    print(f" - 4: {top5[3][1]} - {top5[3][0]}")
+                if len(top5) >= 5:
+                    print(f" - 5: {top5[4][1]} - {top5[4][0]}")
+                print("")
+                
                 answers = 0
                 currentQuestion = currentQuestion + 1
             return
@@ -137,9 +165,8 @@ def handleQuiz(clientsocket, questions):
             else:
                 break
             position = position + 1
-    endMsg = pickle.dumps('{"type":"end", "message":"Thank you for playing!"}') #this message could be a custom variable
-    endMsg = bytes(f'{len(endMsg):<{HEADERSIZE}}', "utf-8") + endMsg
-    clientsocket.send(endMsg)
+    global end
+    end = True
     return
 
 def connect():
@@ -161,7 +188,23 @@ a.start()
 when = input("Listening for players...\nPress enter when enough players have joined.\n\n")
 if when != None:
     closed = True
-    print("The quiz has started!")
-for c in clients:
-    x = threading.Thread(target=handleQuiz, args=(c, questions))
-    x.start()
+    if len(clients)>=1:
+        print("The quiz has started!")
+        for c in clients:
+            x = threading.Thread(target=handleQuiz, args=(c, questions))
+            x.start()
+    else:
+        print("No players were found.")
+        sys.exit(0)
+
+end = False
+while True:
+    if end:
+        print("The quiz is over")
+        print("")
+        print(f"The winner is {sortScores(scores)[0][0]}!")
+        if len(scores) >= 2:
+            print(f"{sortScores(scores)[1][0]} is second.")
+        if len(scores) >= 3:
+            print(f"{sortScores(scores)[2][0]} is third.")
+        break

@@ -11,6 +11,13 @@ s.connect((socket.gethostname(), 1236))
 clientName = input("who are you? ")
 print("Waiting for the quiz host to send the first question.")
 
+def sortScores(scores):
+    top5 = []
+    for record in scores:
+        top5.append([record, scores[record]])
+    top5.sort(key=lambda x: x[1], reverse=True)
+    return top5
+
 full_msg = b''
 new_msg = True
 while True:
@@ -67,15 +74,14 @@ while True:
             print(f"Your current score is {yourScore}")
 
             #dictionary to list so it can be sorted
-            top5 = []
-            for record in message["scoreboard"]:
-                top5.append([record, message["scoreboard"][record]])
-            top5.sort(key=lambda x: x[1], reverse=True)
-
+            top5 = sortScores(message["scoreboard"])
 
             #print top 5
             print("")
-            print("Current scoreboard:")
+            if 'endMessage' not in message:
+                print("Current scoreboard:")
+            else:
+                print("Final scores:")
             print(f" - 1: {top5[0][1]} - {top5[0][0]}")
             if len(top5) >= 2:
                 print(f" - 2: {top5[1][1]} - {top5[1][0]}")
@@ -86,14 +92,22 @@ while True:
             if len(top5) >= 5:
                 print(f" - 5: {top5[4][1]} - {top5[4][0]}")
             print("")
-            print("Prepare yourself for the next question...")
-            print("")
-
-        if message["type"] == "end":
-            print("this quiz has ended.")
-            print(message["message"])
-            break
-
+            
+            if 'endMessage' not in message:
+                print("Prepare yourself for the next question...")
+                print("")
+            else:
+                print("The quiz has ended.")
+                print("")
+                if top5[0][0] == clientName:
+                    print("You won!")
+                if (len(top5) >= 2) and (top5[1][0] == clientName):
+                    print("You came in second!")
+                if (len(top5) >= 3) and (top5[2][0] == clientName):
+                    print("You came in third!")
+                print("")
+                print(message["endMessage"])
+                break
         #reset loop
         new_msg = True
         full_msg = b''
