@@ -2,6 +2,8 @@ import socket
 import pickle
 import json
 import sys
+import time
+import threading
 
 HEADERSIZE = 10 #size of the header of the data we send to the server. In the header we say how long the data is.
 
@@ -17,6 +19,14 @@ def sortScores(scores):
         top5.append([record, scores[record]])
     top5.sort(key=lambda x: x[1], reverse=True)
     return top5
+
+timeOut = False
+
+def timer(seconds):
+    print(seconds)
+    time.sleep(seconds)
+    timeOut = True
+    
 
 full_msg = b''
 new_msg = True
@@ -34,7 +44,10 @@ while True:
         d = pickle.loads(full_msg[HEADERSIZE:])
         message = json.loads(d)
 
-        #print(message)
+        if message["type"] == "connection refused":
+            print("")
+            print("You were too late. The quiz has already started without you.")
+            break
             
         if message["type"] == "question":
             print("")
@@ -46,16 +59,27 @@ while True:
             if 'D' in message['options']:
                 print('- D: '+message['options']['D'])
 
-            # Send answer
+            if 'time' in message:
+                print(f"you have {message['time']} seconds!")
+                #print(message['time'])
+                #x = threading.Thread(target=timer, args=(message['time']))
+                #x.start()
+
+            # ask answer
             while True:
                 print("")
                 answer = input("Your answer: ")
+                # validate answer
                 answer = answer.upper()
                 if answer == "A" or answer == "B" or answer == "C" or answer == "D":
                     break
                 else:
                     print("Please choose between A, B, C or D")
                     continue
+                if timeOut:
+                    print("This answer was too late")
+                timeOut = False
+            #send answer
             answer = '{"sender":"'+clientName+'", "answer":"'+answer+'"}'
             answer = pickle.dumps(answer)
             answer = bytes(f'{len(answer):<{HEADERSIZE}}', "utf-8") + answer
@@ -65,8 +89,6 @@ while True:
             print("Waiting for others to answer...")
 
         if message["type"] == "scores":
-
-            #print(message["scoreboard"])
 
             # get users score from dictionary and print it
             yourScore = message["scoreboard"].get(clientName)

@@ -32,7 +32,8 @@ questions = [ #list of (for now hard-coded) questions that the clients will answ
                 'C':'Blue',
                 'D':'brown'
             },
-            'solution':'C'
+            'solution':'C',
+            'time':30
         },
         {
             'id': '0003',
@@ -52,7 +53,8 @@ questions = [ #list of (for now hard-coded) questions that the clients will answ
                 'B':'Blue!',
                 'C':'That depends. Is it an African swallow or a European one?'
             },
-            'solution':'C'
+            'solution':'C',
+            'time':30
         },
         {
             'id': '0005',
@@ -84,8 +86,10 @@ def sortScores(scores):
 def sendQuestion(clientsocket, question):
 
     solution = question['solution']
-    question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+'}'
-        
+    if 'time' in question:
+        question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"time":'+json.dumps(question['time'])+'}'
+    else:
+        question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+'}'
     #print(question)
     #print(solution)
     
@@ -171,23 +175,29 @@ def handleQuiz(clientsocket, questions):
 
 def connect():
     while True:
-        if closed:
-            break
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((socket.gethostname(), 1236))
         s.listen(5)
-        
+
         clientsocket, address = s.accept()
-        clients.add(clientsocket)
-        print(f"{len(clients)} players have connected.")
+        if access == False:
+            #send back message to client so the client will close connection (I can't figure out how to do it from here)
+            msg = '{"type":"connection refused"}'
+            msg = pickle.dumps(msg)
+            msg = bytes(f'{len(msg):<{HEADERSIZE}}', "utf-8") + msg
+            clientsocket.send(msg)
+        else:
+            clients.add(clientsocket)
+            print(f"{len(clients)} players have connected.")
+            
 
 
-closed = False
+access = True
 a = threading.Thread(target=connect)
 a.start()
-when = input("Listening for players...\nPress enter when enough players have joined.\n\n")
+when = input("Listening for players...\nPress enter when enough players have joined.\n\n") #say when
 if when != None:
-    closed = True
+    access = False
     if len(clients)>=1:
         print("The quiz has started!")
         for c in clients:
