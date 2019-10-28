@@ -23,10 +23,9 @@ def sortScores(scores):
 timeOut = False
 
 def timer(seconds):
-    print(seconds)
     time.sleep(seconds)
+    global timeOut
     timeOut = True
-    
 
 full_msg = b''
 new_msg = True
@@ -61,26 +60,26 @@ while True:
 
             if 'time' in message:
                 print(f"you have {message['time']} seconds!")
-                #print(message['time'])
-                #x = threading.Thread(target=timer, args=(message['time']))
-                #x.start()
+                timeOut = False
+                x = threading.Thread(target=timer, args=([message['time']]))
+                x.start()
 
-            # ask answer
+            # ask answer and validate input
             while True:
                 print("")
                 answer = input("Your answer: ")
-                # validate answer
                 answer = answer.upper()
                 if answer == "A" or answer == "B" or answer == "C" or answer == "D":
                     break
                 else:
                     print("Please choose between A, B, C or D")
                     continue
-                if timeOut:
-                    print("This answer was too late")
-                timeOut = False
             #send answer
-            answer = '{"sender":"'+clientName+'", "answer":"'+answer+'"}'
+            if timeOut:
+                print("You didn't answer in time!")
+                answer = '{"sender":"'+clientName+'", "answer":"out of time"}'
+            else:
+                answer = '{"sender":"'+clientName+'", "answer":"'+answer+'"}'
             answer = pickle.dumps(answer)
             answer = bytes(f'{len(answer):<{HEADERSIZE}}', "utf-8") + answer
 
