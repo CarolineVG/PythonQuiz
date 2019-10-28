@@ -5,10 +5,14 @@ import sys
 import time
 import threading
 
+SERVER_IP = input("Enter the local IP of the quiz master: ")
+if SERVER_IP == "":
+    SERVER_IP = socket.gethostname() #localhost
+
 HEADERSIZE = 10 #size of the header of the data we send to the server. In the header we say how long the data is.
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((socket.gethostname(), 1236))
+s.connect((SERVER_IP, 5000))
 
 clientName = input("who are you? ")
 print("Waiting for the quiz host to send the first question.")

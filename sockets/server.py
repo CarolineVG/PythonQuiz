@@ -5,6 +5,15 @@ import json
 import threading
 import time
 import sys
+import netifaces as ni
+
+'''
+for i in ni.interfaces():
+    print(str(i))
+'''
+SERVER_IP = input("Enter your local IP: ")
+if SERVER_IP == "":
+    SERVER_IP = socket.gethostname() #localhost
 
 HEADERSIZE = 10 #size of the header of the data we send to the client. In the header we say how long the data is.
 clients = set() #a set of all clients that are connected
@@ -176,7 +185,7 @@ def handleQuiz(clientsocket, questions):
 def connect():
     while True:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind((socket.gethostname(), 1236))
+        s.bind((SERVER_IP, 5000))
         s.listen(5)
 
         clientsocket, address = s.accept()
