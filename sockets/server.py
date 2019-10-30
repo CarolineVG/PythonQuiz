@@ -183,11 +183,11 @@ def handleQuiz(clientsocket, questions):
     return
 
 def connect():
-    while True:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind((SERVER_IP, 5000))
-        s.listen(5)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((SERVER_IP, 5000))
+    s.listen(5)
 
+    while True:
         clientsocket, address = s.accept()
         if access == False:
             #send back message to client so the client will close connection (I can't figure out how to do it from here)
