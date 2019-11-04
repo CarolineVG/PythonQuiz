@@ -15,10 +15,12 @@ class Server:
 
         #server variables
         self.access = True #can players (still) join the quiz?
-        self.ready = False #are we complete and ready to start?
+        self.ready = False #are we complete or are we waiting on something?
         self.clients = set() #the players
         self.questionList = [] #list of questions. Saved here as a list of dictionaries
-        self.currentQuestion #our progress into the quiz
+        self.currentQuestion = 0 #our progress into the quiz
+        self.scores = {} #dictionary of scores
+        self.answers = 0 #a counter that keeps track of how many clients have answered already. Resets with every new question.
 
     def join(self): #method for clients, may remove it later
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -53,89 +55,146 @@ class Server:
             print("No players were found.")
             sys.exit(0)
 
-    def sendToClient(client, json):
+    def sendToClient(self, client, json):
         message = pickle.dumps(json)
-        message = bytes(f'{len(message):<{HEADERSIZE}}', "utf-8") + message
+        message = bytes(f'{len(message):<{self.headerSize}}', "utf-8") + message
         client.send(message)
 
-    def startQuiz():
-        if self.ready:
-            for c in self.clients:
-                print("floep")
-                #x = threading.Thread(target=handleQuiz, args=(c, questions))
-                #x.start()
-        else:
-            print("Not ready yet. First we need to connect to all players.")
+    def sendToAll(self, json):
+        for c in self.clients:
+            self.sendToClient(c, json)
 
     def sendQuestion(self, client, question):
-        solution = question['solution']
         if 'time' in question:
             question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"time":'+json.dumps(question['time'])+'}'
         else:
             question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+'}'
         self.sendToClient(client, question)
 
-    def receiveAnswer():
+    def updateScores(self, name, answer, solution):
+        #check if the answer was correct
+        if answer == solution:
+            #check if client is already in the scores
+            if name in self.scores:
+                self.scores[name] = self.scores.get(name) + 1
+            else:
+                self.scores[name] = 1
+        elif name not in self.scores:
+            self.scores[name] = 0
+
+    def sortScores(self, scores):
+        top5 = []
+        for record in scores:
+            top5.append([record, scores[record]])
+        top5.sort(key=lambda x: x[1], reverse=True)
+        return top5
+
+    def everyoneAnswered(self):
+        if self.answers == len(self.clients):
+            return True
+        else:
+            return False
+
+    def receiveAnswer(self, client, solution):
         fullAnswer = b''
         newAnswer = True
         while True:
-            response = clientsocket.recv(8)
+            response = client.recv(8)
             if newAnswer:
-                answerLength = int(response[:HEADERSIZE])
+                answerLength = int(response[:self.headerSize])
                 newAnswer = False
 
             fullAnswer += response
-            if len(fullAnswer)-HEADERSIZE == answerLength:
-                answer = pickle.loads(fullAnswer[HEADERSIZE:])
+            if len(fullAnswer)-self.headerSize == answerLength:
+                answer = pickle.loads(fullAnswer[self.headerSize:])
                 answer = json.loads(answer)
                 
-                global answers
-                answers = answers + 1
+                self.answers = self.answers + 1
 
-                #check if the answer was correct
-                if answer["answer"] == solution:
-                    #check if client is already in the scores
-                    if answer["sender"] in scores:
-                        scores[answer["sender"]] = scores.get(answer["sender"]) + 1
-                    else:
-                        scores[answer["sender"]] = 1
-                elif answer["sender"] not in scores:
-                    scores[answer["sender"]] = 0
-                if answers == len(clients):
-                    self.questionList
-                    self.currentQuestion
-                    if self.currentQuestion == len(self.questionList)-1:
-                        scoreboard = '{"type":"scores", "scoreboard":'+json.dumps(scores)+',"endMessage":"Thank you for playing!"}'
-                    else:
-                        scoreboard = '{"type":"scores", "scoreboard":'+json.dumps(scores)+'}'
-                    sendToAll(scoreboard)
-                    print(f"All players answered question {currentQuestion+1}")
-
-                    top5 = sortScores(scores)
-
-                    print("")
-                    print("Current scoreboard:")
-                    print(f" - 1: {top5[0][1]} - {top5[0][0]}")
-                    if len(top5) >= 2:
-                        print(f" - 2: {top5[1][1]} - {top5[1][0]}")
-                    if len(top5) >= 3:
-                        print(f" - 3: {top5[2][1]} - {top5[2][0]}")
-                    if len(top5) >= 4:
-                        print(f" - 4: {top5[3][1]} - {top5[3][0]}")
-                    if len(top5) >= 5:
-                        print(f" - 5: {top5[4][1]} - {top5[4][0]}")
-                    print("")
+                self.updateScores(answer["sender"], answer["answer"], solution)
+                
+                if self.everyoneAnswered():
+                    #all players have answered.
                     
-                    answers = 0
-                    currentQuestion = currentQuestion + 1
+                    print(f"All players answered question {self.currentQuestion+1}")
+
+                    
+                    self.answers = 0
+                    self.currentQuestion = self.currentQuestion + 1
+                    self.ready = True
                 return
+
+    def getScores(self):
+        return self.scores
+
+    def getSortedScores(self):
+        return sortScores(self.scores)
+
+    def waitAndGetScores(self):
+        if self.ready == False:
+            print("waiting for the scores...")
+        while True:
+            if self.ready:
+                return self.scores
+            
+    def waitAndGetSortedScores(self):
+        if self.ready == False:
+            print("waiting for the scores...")
+        while True:
+            if self.ready:
+                return sortScores(self.scores)
+                
+
+    def sendScores(self):
+        if self.lastQuestion():
+            scoreboard = '{"type":"scores", "scoreboard":'+json.dumps(self.scores)+',"endMessage":"Thank you for playing!"}'
+        else:
+            scoreboard = '{"type":"scores", "scoreboard":'+json.dumps(self.scores)+'}'
+        self.sendToAll(scoreboard)
+
+    def waitAndSendScores(self):
+        if self.ready == False:
+            print("Waiting for the scores...")
+        while True:
+            if self.ready:
+                print("Scores are in.")
+                self.sendScores()
+                return
+    
+    def nextQuestionThread(self, position, client):
+        self.sendQuestion(client, self.questionList[position])
+        self.receiveAnswer(client, self.questionList[position]['solution'])
+        if self.ready:
+            time.sleep(1)
+            print("Everyone has answered")
+            return
+                
+    def handleNextQuestion(self):
+        if self.ready:
+            self.ready = False
+            print(f"sending question {self.currentQuestion+1}")
+            for c in self.clients:
+                x = threading.Thread(target=self.nextQuestionThread, args=(self.currentQuestion, c))
+                x.start()
+        else:
+            print("Not ready! We're still waiting for all clients.")
 
     def setQuestionList(self, questionList):
         self.questionList = questionList
         
     def addQuestion(self, dictionary):
         self.questionList.append(question)
-        
+
+    def lastQuestion(self):
+        if self.currentQuestion == len(self.questionList)-1:
+            return True
+        else:
+            return False
+
+    '''
+    TO DO:
+        A method that ends the quiz. (this required changes on the client side too)
+    '''
 
 SERVER_IP = input("Enter your local IP: ")
 if SERVER_IP == "":
@@ -205,5 +264,14 @@ server.setQuestionList([ #list of (for now hard-coded) questions that the client
         }
     ])
 
+server.handleNextQuestion()
+server.waitAndSendScores()
 
-
+while True:
+    tuut = input("press enter to send the next question...")
+    
+    server.handleNextQuestion()
+    server.waitAndSendScores()
+    if server.lastQuestion():
+        print("This was the last question")
+    

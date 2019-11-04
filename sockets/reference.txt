@@ -1,0 +1,51 @@
+# create a new server object
+server = Server(SERVER_IP, PORT)
+
+# let clients connect to the server
+server.host()
+
+# close off access to the quiz when enough players have joined
+server.stopHosting()
+
+# give the server a list of questions. (Python list of dictionaries)
+server.setQuestionList([listOfDictionaries])
+
+# add another question to the question list
+server.addQuestion(dictionary)
+
+# send the next question to the clients and collect the answers
+server.handleNextQuestion()
+
+# get the scores in the form of a dictionary.
+server.getScores()
+
+# get the scores in the form of a python list, sorted by points
+server.getSortedScores()
+
+	#sort a dictionary of scores
+	sortedScores = server.sortScores(dictionary)
+	#this will be a list
+
+# send the scores to the clients
+server.sendScores()
+
+# in the case there's a chance the server hasn't received all the scores yet, you can use these.
+# they pause the current thread untill all scores are in.
+server.waitAndGetScores()
+server.waitAndGetSortedScores()
+server.waitAndSendScores()
+
+# send json to all clients
+server.sendToAll()
+
+# variable that says if server is "ready". returns True or False
+server.ready
+
+# check if everyone has answered the latest question. returns True or False
+server.everyoneAnswered()
+
+# check if we're at the last question. returns True or False
+server.lastQuestion()
+
+# end the quiz
+A method for this will be made in the future. Rightnow it ends automaticly when players receive their last question.
