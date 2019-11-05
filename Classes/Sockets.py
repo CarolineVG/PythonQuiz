@@ -183,7 +183,7 @@ class Server:
         self.questionList = questionList
         
     def addQuestion(self, dictionary):
-        self.questionList.append(question)
+        self.questionList.append(dictionary)
 
     def lastQuestion(self):
         if self.currentQuestion == len(self.questionList)-1:
