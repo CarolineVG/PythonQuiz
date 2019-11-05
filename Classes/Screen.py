@@ -1,6 +1,8 @@
 import sqlite3
 from tkinter import *
 from Classes.Database import Database
+from Classes.Quiz import Quiz
+from Classes.Question import Question
 
 
 # class QuizApp
@@ -39,7 +41,6 @@ class HomeScreen(Frame):
                             width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(JoinQuizScreen)).pack()
 
 
-
 # screen CREATE QUIZ
 class CreateQuizScreen(Frame):
     # constructor
@@ -48,22 +49,37 @@ class CreateQuizScreen(Frame):
         Frame.__init__(self, master)
 
         def test():
-            q = questionValue.get()
-            a1 = answer1Value.get()
-            a2 = answer2Value.get()
-            a3 = answer3Value.get()
-            a4 = answer4Value.get()
-            print(f'{q} ? {a1}, {a2}, {a3}, {a4}')
+            # test Quiz Class
 
-            # add to db
-            db = Database()
-            # id=1, quizid=1, solution = b (question b is correct)
-            db.insertData(1, q, 'b', a1, a2, a3, a4)
-            db.getData()
+            # create new Quiz
+            newQuiz = Quiz(1, 'test')
+            newQuiz.addQuizToDatabase()
+            newQuiz.getDataFromDatabase()
 
-            conn = sqlite3.connect("Quiz.db")
-            with conn:
-                cursor = conn.cursor()
+            # create new Question
+            newQuestion = Question(1, 'question', 2, 'a', 'b', 'c', 'd', 60, 10)
+            newQuestion.addQuestionToDatabase()
+            newQuestion.getQuestionFromDatabase()
+
+            # to do: change hardcoded question to input from user
+
+
+            # q = questionValue.get()
+            # a1 = answer1Value.get()
+            # a2 = answer2Value.get()
+            # a3 = answer3Value.get()
+            # a4 = answer4Value.get()
+            # print(f'{q} ? {a1}, {a2}, {a3}, {a4}')
+            #
+            # # add to db
+            # db = Database()
+            # # id=1, quizid=1, solution = b (question b is correct)
+            # db.insertData(1, q, 'b', a1, a2, a3, a4)
+            # db.getData()
+            #
+            # conn = sqlite3.connect("Quiz.db")
+            # with conn:
+            #     cursor = conn.cursor()
 
         questionValue = StringVar()
         answer1Value = StringVar()
