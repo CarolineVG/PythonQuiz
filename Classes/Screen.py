@@ -10,6 +10,12 @@ class QuizApp(Tk):
         self._frame = None
         self.switch_frame(HomeScreen)
 
+        # check size of screen
+        height = self.winfo_screenheight()
+        width = self.winfo_screenwidth()
+        pixels = str(width) + 'x' + str(height)
+        self.geometry(pixels)
+
     def switch_frame(self, frame_class):
         new_frame = frame_class(self)
         if self._frame is not None:
