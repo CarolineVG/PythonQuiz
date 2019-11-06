@@ -3,7 +3,7 @@ from tkinter import *
 from Classes.Database import Database
 from Classes.Quiz import Quiz
 from Classes.Question import Question
-
+from Classes.Sockets import Server
 
 # class QuizApp
 class QuizApp(Tk):
@@ -53,16 +53,27 @@ class CreateQuizScreen(Frame):
 
             # create new Quiz
             newQuiz = Quiz(1, 'test')
-            newQuiz.addQuizToDatabase()
+            #newQuiz.addQuizToDatabase()
             newQuiz.getDataFromDatabase()
 
             # create new Question
             newQuestion = Question(1, 'question', 2, 'a', 'b', 'c', 'd', 60, 10)
-            newQuestion.addQuestionToDatabase()
+            #newQuestion.addQuestionToDatabase()
             newQuestion.getQuestionFromDatabase()
 
             # to do: change hardcoded question to input from user
 
+            # test: from database to json format to send to server
+            newQuestion.sendQuestionToServer()
+
+            s = Server("", 5000)
+            s.host()
+
+            # server.addQuestion(question)
+
+            # question = '{"type":"question", "sender": "Host", "id":"' + question['id'] + '", "question": "' + question[
+            #     'question'] + '", "options":' + json.dumps(question['options']) + ',"time":' + json.dumps(
+            #     question['time']) + '}'
 
             # q = questionValue.get()
             # a1 = answer1Value.get()

@@ -1,4 +1,6 @@
 # class Question
+import json
+
 from Classes.Database import Database
 
 
@@ -36,4 +38,49 @@ class Question:
         records = cursor.fetchall()
         print(f'db - {records}')
 
+    def sendQuestionToServer(self):
+        # test with first question
+        db = Database()
+        conn = db.getConnection()
+        cursor = conn.cursor()
+
+        # get data from db
+        cursor.execute('SELECT * FROM Questions WHERE id=1')
+        records = cursor.fetchall()
+        print(f'first question - {records}')
+
+        question = records[0]
+        answers = []
+        answers.append((question[5]))
+        answers.append((question[6]))
+        answers.append((question[7]))
+        answers.append((question[8]))
+
+        print(f'answers: {answers}')
+
+        # question = '{"type":"question", "sender": "Host", "id":"' + question['Id'] + '", "question": "' + json.dumps(question['Question']) + '}'
+
+        # + '", "options":' + json.dumps(answers) + ',"time":' + question['Timer'] + question['Points'] + '}'
+
+        questionsDictionary = []
+
+        question = {
+            "type": "question",
+            "sender": "Host",
+            "id": question[0],
+            "question": question[2],
+            "solution": question[3],
+            "options": {
+                "answer1": question[4],
+                "answer2": question[5],
+                "answer3": question[6],
+                "answer4": question[7]
+            },
+            "time": question[8],
+            "points": question[9]
+        }
+
+        questionsDictionary.append(question)
+
+        print(f'string: {question}')
 
