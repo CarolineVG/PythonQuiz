@@ -1,3 +1,5 @@
+### server
+
 # create a new server object
 server = Server(SERVER_IP, PORT)
 
@@ -49,3 +51,48 @@ server.lastQuestion()
 
 # end the quiz
 A method for this will be made in the future. Rightnow it ends automaticly when players receive their last question.
+
+
+
+### client
+
+# create a new client object
+client = Client(SERVER_IP, PORT)
+
+# join a server that is accepting clients
+client.join()
+
+# set name of the client. This is needed for the scoreboard
+client.setName(string)
+
+# await the next message from the server
+client.listen()
+
+# The last message the server sent
+client.lastMessage
+
+# ways to check if the server send a question:
+if client.getQuestion() != None:
+	#do what you would do if you got a question here
+
+# get the question (string)
+client.getQuestion()
+
+# get the answer options (dict)
+client.getQuestionOptions()
+
+# answer a question. (for now a string. Just a, b, c or d)
+client.answer(option)
+
+# check how much time there is to answer it (seconds)
+client.getTimer()
+
+# if the user didn't answer in time. Simply answer for them.
+client.answer("out of time")
+client.answer(None)
+client.answer(False)
+#any of the above will do
+
+
+
+
