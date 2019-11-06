@@ -28,9 +28,21 @@ class Server:
         print("connected to a quiz host.")
 
     def host(self):
+        print("lol")
         self.access = True
         a = threading.Thread(target=self.connectClients)
-        a.start()
+
+        # test output
+        output = self.connectClients()
+        return output
+
+        #a.start()
+
+    def sendToClient(self, client, json):
+        message = pickle.dumps(json)
+        message = bytes(f'{len(message):<{self.headerSize}}', "utf-8") + message
+        client.send(message)
+
 
     def connectClients(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -39,11 +51,14 @@ class Server:
         while True:
             clientsocket, address = s.accept()
             if self.access == False:
+                print("conn refused")
                 #send back message to client so the client will close connection (I can't figure out how to do it from here)
                 sendToClient(clientSocket, '{"type":"connection refused"}')
             else:
                 self.clients.add(clientsocket)
-            print(f"{len(self.clients)} players have connected.")
+            #print(f"{len(self.clients)} players have connected.")
+            output = str(len(self.clients)) + ' players have connected.'
+            return output
     
     def stopHosting(self):
         self.access = False
@@ -55,10 +70,6 @@ class Server:
             print("No players were found.")
             sys.exit(0)
 
-    def sendToClient(self, client, json):
-        message = pickle.dumps(json)
-        message = bytes(f'{len(message):<{self.headerSize}}', "utf-8") + message
-        client.send(message)
 
     def sendToAll(self, json):
         for c in self.clients:
