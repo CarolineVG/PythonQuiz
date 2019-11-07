@@ -208,6 +208,7 @@ class Client:
         self.name = None #name of this client on the scoreboard
         self.lastMessage = None
         self.newQuestion = None
+        self.newScores = None
     
     def join(self): #method for clients, may remove it later
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -299,6 +300,23 @@ class Client:
         else:
             print("No question was asked")
             return None
+
+    def getScores(self):
+        if self.newScores != None:
+            return self.sortScores(self.newScores)
+        else:
+            print("No scores have been send")
+            return None
+
+    def getYourScore(self):
+        if self.newScores != None:
+            return self.newScores.get(self.name)
+        else:
+            print("No scores have been send")
+            return None
+
+    def end():
+        self.server.close()
 
 
 
