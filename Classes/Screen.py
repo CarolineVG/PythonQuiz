@@ -186,31 +186,27 @@ class HostQuizWaitingScreen(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
 
-        global server
-        server = Server("192.168.1.231",5000)
-
-        global pleaseStop
+        # var server
+        self.server = Server("192.168.1.231",5000)
+        self.stopThread = False
 
         def updateInterface():
             print('update interface')
-            outputLabel = Label(self, text=str(len(server.clients)), fg='black', font=('arial', 15, 'bold')).pack()
+            outputLabel = Label(self, text=str(len(self.server.clients)), fg='black', font=('arial', 15, 'bold')).pack()
             while True:
-                if pleaseStop:
+                if self.stopThread:
                     print('in please stop')
                     break
                 else:
                     time.sleep(5)
                     print(f'threading')
-                    outputLabel = Label(self, text=str(len(server.clients)), fg='black',font=('arial', 15, 'bold')).pack()
+                    outputLabel = Label(self, text=str(len(self.server.clients)), fg='black',font=('arial', 15, 'bold')).pack()
 
         def startServer():
             print("start server")
             # test server
             #server = Server("", 5000)
-            server.host()
-
-            global pleaseStop
-            pleaseStop = False
+            self.server.host()
 
             # is quiz still open to players?
             # if server.access:
@@ -227,8 +223,7 @@ class HostQuizWaitingScreen(Frame):
         def stopThread():
             # stop thread:
             print("stop thread")
-            global pleaseStop
-            pleaseStop = True
+            self.stopThread = True
 
         label1 = Label(self, text='Host Quiz', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
         startServer()
