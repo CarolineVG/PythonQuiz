@@ -95,6 +95,13 @@ client.answer(False)
 
 # ways to check if the server send scores:
 if client.getScores() != None:
-	#do what you would do if you got a question here
+	#do what you would do if you got scores here
 
+# get your own score:
+client.getYourScore()
+
+#get sorted list of all scores:
+client.getScores()
+
+#end quiz
 
