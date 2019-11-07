@@ -1,4 +1,6 @@
 import sqlite3
+import threading
+import time
 from tkinter import *
 from Classes.Database import Database
 from Classes.Quiz import Quiz
@@ -179,37 +181,68 @@ class HostQuizScreen(Frame):
                             width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
 
 
-# screen per quiz
+# screen WAITING QUIZ (temporary quiz1)
 class HostQuizWaitingScreen(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
 
+        global server
+        server = Server("192.168.1.231",5000)
+
+        global pleaseStop
+
+        def updateInterface():
+            print('update interface')
+            outputLabel = Label(self, text=str(len(server.clients)), fg='black', font=('arial', 15, 'bold')).pack()
+            while True:
+                if pleaseStop:
+                    print('in please stop')
+                    break
+                else:
+                    time.sleep(5)
+                    print(f'threading')
+                    outputLabel = Label(self, text=str(len(server.clients)), fg='black',font=('arial', 15, 'bold')).pack()
+
         def startServer():
-            print("click")
+            print("start server")
             # test server
-            s = Server("", 5000)
-            s.host()
+            #server = Server("", 5000)
+            server.host()
+
+            global pleaseStop
+            pleaseStop = False
 
             # is quiz still open to players?
-            if s.access:
-                # listen to connections multiple times?
-                # vragen aan docent?
-                # - loopen om de zoveel seconden dit updaten
-                output = s.getNumberOfClientsRealtime()
-                print(output)
-            else:
-                print("let's start the game!")
+            # if server.access:
+            #     # listen to connections multiple times?
+            #     # vragen aan docent?
+            #     # - loopen om de zoveel seconden dit updaten
+            #     updateInterface()
+            # else:
+            #     print("let's start the game!")
 
             # check if label stays up to date with the connected clients
 
-            outputLabel = Label(self, text=output, fg='black', font=('arial', 15, 'bold')).pack()
 
-        label1 = Label(self, text='Host Quiz', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x",
-                                                                                            pady=5)
+        def stopThread():
+            # stop thread:
+            print("stop thread")
+            global pleaseStop
+            pleaseStop = True
+
+        label1 = Label(self, text='Host Quiz', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
         startServer()
+
+
+        button4 = Button(self, text='Stop thread (start quiz)', fg='black', relief=FLAT,
+                         width=16, font=('arial', 20, 'bold'), command=stopThread).pack()
+
 
         button4 = Button(self, text='Return', fg='black', relief=FLAT,
                          width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
+
+
+        x = threading.Thread(target=updateInterface).start()
 
 
 # screen JOIN QUIZ
