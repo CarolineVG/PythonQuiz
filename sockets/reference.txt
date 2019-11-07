@@ -93,6 +93,8 @@ client.answer(None)
 client.answer(False)
 #any of the above will do
 
-
+# ways to check if the server send scores:
+if client.getScores() != None:
+	#do what you would do if you got a question here
 
 
