@@ -187,7 +187,7 @@ class HostQuizWaitingScreen(Frame):
         def startServer():
             print("click")
             # test server
-            s = Server("10.68.227.61", 5000)
+            s = Server("", 5000)
             s.host()
 
             # is quiz still open to players?
