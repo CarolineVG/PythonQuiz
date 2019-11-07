@@ -1,4 +1,6 @@
 import sqlite3
+import threading
+import time
 from tkinter import *
 from Classes.Database import Database
 from Classes.Quiz import Quiz
@@ -11,12 +13,13 @@ class QuizApp(Tk):
         Tk.__init__(self)
         self._frame = None
         self.switch_frame(HomeScreen)
+        self.geometry("600x500")
 
         # check size of screen
-        height = self.winfo_screenheight()
-        width = self.winfo_screenwidth()
-        pixels = str(width) + 'x' + str(height)
-        self.geometry(pixels)
+        # height = self.winfo_screenheight()
+        # width = self.winfo_screenwidth()
+        # pixels = str(width) + 'x' + str(height)
+        # self.geometry(pixels)
 
     def switch_frame(self, frame_class):
         new_frame = frame_class(self)
@@ -121,22 +124,125 @@ class CreateQuizScreen(Frame):
         button3 = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
 
 
+# screen TEST SERVER SCREEN
+class TestServerScreen(Frame):
+    # constructor
+    def __init__(self, master):
+        # create quiz
+        Frame.__init__(self, master)
+
+        def insertDataInDatabase():
+            # test Quiz Class
+            # create new Quiz
+            newQuiz = Quiz(1, 'test')
+            newQuiz.addQuizToDatabase()
+            newQuiz.getDataFromDatabase()
+
+            # create new Question
+            newQuestion = Question(1, 'question', 2, 'a', 'b', 'c', 'd', 60, 10)
+            newQuestion.addQuestionToDatabase()
+            newQuestion.getQuestionFromDatabase()
+
+            # to do: change hardcoded question to input from user
+
+            # test: from database to json format to send to server
+            newQuestion.sendQuestionToServer()
+
+        btnDatabase = Button(self, text='Insert databases', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=insertDataInDatabase).pack()
+        btnStartServer = Button(self, text='Start server', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizScreen)).pack()
+        btnStartQuiz = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
+
 
 # screen HOST QUIZ
 class HostQuizScreen(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
 
+        def showQuizes():
+            # show all quizes from database
+            print('show quizes from database')
+
+            q = Quiz()
+            quizes = q.getDataFromDatabase()
+            print(f'db: {quizes}')
+
+            for item in quizes:
+                print(item)
+                # temporary hardcoded link to first quiz
+                button1 = Button(self, text=item[1], fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),
+                                 command=lambda: master.switch_frame(HostQuizWaitingScreen)).pack()
+
+
         label1 = Label(self, text='Host Quiz', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
 
-        button1 = Button(self, text='Quiz 1', fg='black', relief=FLAT, width=16,
-                            font=('arial', 20, 'bold')).pack()
-        button2 = Button(self, text='Quiz 2', fg='black', relief=FLAT,
-                            width=16, font=('arial', 20, 'bold')).pack()
-        button3 = Button(self, text='Quiz 3', fg='black', relief=FLAT,
-                            width=16, font=('arial', 20, 'bold')).pack()
+        showQuizes()
+
         button4 = Button(self, text='Return', fg='black', relief=FLAT,
                             width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
+
+
+# screen WAITING QUIZ (temporary quiz1)
+class HostQuizWaitingScreen(Frame):
+    def __init__(self, master):
+        Frame.__init__(self, master)
+
+        global server
+        server = Server("192.168.1.231",5000)
+
+        global pleaseStop
+
+        def updateInterface():
+            print('update interface')
+            outputLabel = Label(self, text=str(len(server.clients)), fg='black', font=('arial', 15, 'bold')).pack()
+            while True:
+                if pleaseStop:
+                    print('in please stop')
+                    break
+                else:
+                    time.sleep(5)
+                    print(f'threading')
+                    outputLabel = Label(self, text=str(len(server.clients)), fg='black',font=('arial', 15, 'bold')).pack()
+
+        def startServer():
+            print("start server")
+            # test server
+            #server = Server("", 5000)
+            server.host()
+
+            global pleaseStop
+            pleaseStop = False
+
+            # is quiz still open to players?
+            # if server.access:
+            #     # listen to connections multiple times?
+            #     # vragen aan docent?
+            #     # - loopen om de zoveel seconden dit updaten
+            #     updateInterface()
+            # else:
+            #     print("let's start the game!")
+
+            # check if label stays up to date with the connected clients
+
+
+        def stopThread():
+            # stop thread:
+            print("stop thread")
+            global pleaseStop
+            pleaseStop = True
+
+        label1 = Label(self, text='Host Quiz', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+        startServer()
+
+
+        button4 = Button(self, text='Stop thread (start quiz)', fg='black', relief=FLAT,
+                         width=16, font=('arial', 20, 'bold'), command=stopThread).pack()
+
+
+        button4 = Button(self, text='Return', fg='black', relief=FLAT,
+                         width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
+
+
+        x = threading.Thread(target=updateInterface).start()
 
 
 # screen JOIN QUIZ

@@ -7,6 +7,10 @@ class Quiz:
         self.id = id
         self.quizName = quizName
 
+    def __init__(self):
+        self.id = id
+
+
     def addQuizToDatabase(self):
         db = Database()
         conn = db.getConnection()
@@ -25,4 +29,6 @@ class Quiz:
         cursor.execute('SELECT * FROM Quizes')
         records = cursor.fetchall()
         print(f'db - {records}')
+
+        return records
 
