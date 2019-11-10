@@ -40,6 +40,7 @@ class Server:
         s.bind((self.ip, self.port))
         s.listen(5)
         while True:
+            print('loops')
             clientsocket, address = s.accept()
             if self.access == False:
                 print("conn refused")
@@ -47,9 +48,7 @@ class Server:
                 self.sendToClient(self.clientSocket, '{"type":"connection refused"}')
             else:
                 self.clients.add(clientsocket)
-            #print(f"{len(self.clients)} players have connected.")
-            output = str(len(self.clients)) + ' players have connected.'
-            return output
+            print(f"{len(self.clients)} players have connected.")
     
     def stopHosting(self):
         self.access = False
