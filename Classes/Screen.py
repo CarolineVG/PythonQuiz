@@ -7,6 +7,10 @@ from Classes.Quiz import Quiz
 from Classes.Question import Question
 from Classes.Sockets import Server
 
+# global server var
+server = ''
+hostQuiz = 0
+
 # class QuizApp
 class QuizApp(Tk):
     def __init__(self):
@@ -21,12 +25,20 @@ class QuizApp(Tk):
         # pixels = str(width) + 'x' + str(height)
         # self.geometry(pixels)
 
-    def switch_frame(self, frame_class):
+    def switch_frame(self, frame_class, *args):
+
         new_frame = frame_class(self)
         if self._frame is not None:
             self._frame.destroy()
-        self._frame = new_frame
-        self._frame.pack()
+
+        if args:
+            self._frame = new_frame
+            #button4 = Button(self, text=args, fg='black', relief=FLAT, width=16).pack()
+            server = args
+            self._frame.pack()
+        else:
+            self._frame = new_frame
+            self._frame.pack()
 
 
 # screen HOME
@@ -169,6 +181,7 @@ class HostQuizScreen(Frame):
             for item in quizes:
                 print(item)
                 # temporary hardcoded link to first quiz
+                # can't pass vars via classes, use global var hostQuiz?
                 button1 = Button(self, text=item[1], fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),
                                  command=lambda: master.switch_frame(HostQuizWaitingScreen)).pack()
 
@@ -177,8 +190,8 @@ class HostQuizScreen(Frame):
 
         showQuizes()
 
-        button4 = Button(self, text='Return', fg='black', relief=FLAT,
-                            width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
+        button4 = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),
+                         command=lambda: master.switch_frame(HomeScreen)).pack()
 
 
 # screen WAITING QUIZ (temporary quiz1)
@@ -187,57 +200,143 @@ class HostQuizWaitingScreen(Frame):
         Frame.__init__(self, master)
 
         # var server
-        self.server = Server("192.168.1.231",5000)
+        self.server = Server("", 5000)
         self.stopThread = False
+
+        global server
+        server = self.server
 
         def updateInterface():
             print('update interface')
+            amountOfPlayers = len(self.server.clients)
             outputLabel = Label(self, text=str(len(self.server.clients)), fg='black', font=('arial', 15, 'bold')).pack()
             while True:
                 if self.stopThread:
                     print('in please stop')
+                    self.server.stopHosting()
+                    server = self.server
+                    # temporary hardcoded
+                    # start quiz
+                    button4 = Button(self, text='Start Quiz', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),
+                                     command=lambda: master.switch_frame(HostQuizStartScreen)).pack()
                     break
                 else:
-                    time.sleep(5)
+                    time.sleep(2)
                     print(f'threading')
-                    outputLabel = Label(self, text=str(len(self.server.clients)), fg='black',font=('arial', 15, 'bold')).pack()
+                    if amountOfPlayers == len(self.server.clients):
+                        # don't update label
+                        print('dont update')
+                    else:
+                        outputLabel = Label(self, text=str(len(self.server.clients)), fg='black',font=('arial', 15, 'bold')).pack()
+                        amountOfPlayers = len(self.server.clients)
 
         def startServer():
             print("start server")
-            # test server
-            #server = Server("", 5000)
             self.server.host()
-
-            # is quiz still open to players?
-            # if server.access:
-            #     # listen to connections multiple times?
-            #     # vragen aan docent?
-            #     # - loopen om de zoveel seconden dit updaten
-            #     updateInterface()
-            # else:
-            #     print("let's start the game!")
-
-            # check if label stays up to date with the connected clients
-
 
         def stopThread():
             # stop thread:
             print("stop thread")
             self.stopThread = True
 
+
         label1 = Label(self, text='Host Quiz', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+
         startServer()
 
-
-        button4 = Button(self, text='Stop thread (start quiz)', fg='black', relief=FLAT,
+        button4 = Button(self, text='Stop thread', fg='black', relief=FLAT,
                          width=16, font=('arial', 20, 'bold'), command=stopThread).pack()
-
 
         button4 = Button(self, text='Return', fg='black', relief=FLAT,
                          width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
 
-
         x = threading.Thread(target=updateInterface).start()
+
+
+# screen JOIN QUIZ
+class HostQuizStartScreen(Frame):
+    def __init__(self, master):
+        Frame.__init__(self, master)
+        # get server object from global server
+        self.server = server
+        print(f'server start screen: {self.server}')
+
+
+        # server object from hostquiz waiting screen
+
+        def sendFirstQuestion():
+
+            self.server.setQuestionList([  # list of (for now hard-coded) questions that the clients will answer
+                {
+                    'id': '0001',
+                    'question': 'What is the first letter of the alphabet?',
+                    'options': {
+                        'A': 'A',
+                        'B': 'B',
+                        'C': 'C',
+                        'D': 'D'
+                    },
+                    'solution': 'A'
+                },
+                {
+                    'id': '0002',
+                    'question': 'What colour is the sky?',
+                    'options': {
+                        'A': 'Green',
+                        'B': 'Red',
+                        'C': 'Blue',
+                        'D': 'brown'
+                    },
+                    'solution': 'C',
+                    'time': 30
+                },
+                {
+                    'id': '0003',
+                    'question': 'Who is the best python programmer?',
+                    'options': {
+                        'A': 'Roel',
+                        'B': 'Caroline',
+                        'C': 'Santa Claus'
+                    },
+                    'solution': 'B'
+                },
+                {
+                    'id': '0004',
+                    'question': 'What is the airspeed velocity of an unladen swallow?',
+                    'options': {
+                        'A': 'I don\'t know that.',
+                        'B': 'Blue!',
+                        'C': 'That depends. Is it an African swallow or a European one?'
+                    },
+                    'solution': 'C',
+                    'time': 30
+                },
+                {
+                    'id': '0005',
+                    'question': 'Was this a fun quiz?',
+                    'options': {
+                        'A': 'Yes!',
+                        'B': 'No.'
+                    },
+                    'solution': 'B'
+                }
+            ])
+
+            self.server.handleNextQuestion()
+            self.server.waitAndSendScores()
+
+            # print(f'access: {self.server.access}')
+            # print(f'ready: {self.server.ready}')
+            # print(f'clients: {self.server.clients}')
+            # print(f'questinslist: {self.server.questionList}')
+            # print(f'current question: {self.server.currentQuestion}')
+            # print(f'scores: {self.server.scores}')
+            # print(f'answers: {self.server.answers}')
+
+        # PROBLEM: new screen only shows AFTER players answer first question
+        label1 = Label(self, text='Players are answering...', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+
+        sendFirstQuestion()
 
 
 # screen JOIN QUIZ
