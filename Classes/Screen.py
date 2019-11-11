@@ -115,8 +115,6 @@ class CreateQuestionScreen(Frame):
             a4 = answer4Value.get()
             s = solutionValue.get()
 
-            int(s)
-
             # create new Question: temp: 2 = solution
             newQuestion = Question()
             newQuestion.addQuestion(createQuizId, q, s, a1, a2, a3, a4, 60, 10)
@@ -166,10 +164,10 @@ class CreateQuestionScreen(Frame):
         answer4Input = Entry(self, textvar=answer4Value).pack()
 
         solutionLabel = Label(self, text='Correct answer', fg='black', font=('arial', 16, 'bold')).pack()
-        r1 = Radiobutton(self, text='1', variable=solutionValue, value='1').pack()
-        r2 = Radiobutton(self, text='2', variable=solutionValue, value='2').pack()
-        r3 = Radiobutton(self, text='3', variable=solutionValue, value='3').pack()
-        r4 = Radiobutton(self, text='4', variable=solutionValue, value='4').pack()
+        r1 = Radiobutton(self, text='1', variable=solutionValue, value='option1').pack()
+        r2 = Radiobutton(self, text='2', variable=solutionValue, value='option2').pack()
+        r3 = Radiobutton(self, text='3', variable=solutionValue, value='option3').pack()
+        r4 = Radiobutton(self, text='4', variable=solutionValue, value='option4').pack()
 
         button1 = Button(self, text='Save and next question', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=test).pack()
         button2 = Button(self, text='Finish quiz', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizScreen)).pack()
@@ -307,64 +305,75 @@ class HostQuizStartScreen(Frame):
 
         def sendFirstQuestion():
 
-            self.server.setQuestionList([  # list of (for now hard-coded) questions that the clients will answer
-                {
-                    'id': '0001',
-                    'question': 'What is the first letter of the alphabet?',
-                    'options': {
-                        'A': 'A',
-                        'B': 'B',
-                        'C': 'C',
-                        'D': 'D'
-                    },
-                    'solution': 'A'
-                },
-                {
-                    'id': '0002',
-                    'question': 'What colour is the sky?',
-                    'options': {
-                        'A': 'Green',
-                        'B': 'Red',
-                        'C': 'Blue',
-                        'D': 'brown'
-                    },
-                    'solution': 'C',
-                    'time': 30
-                },
-                {
-                    'id': '0003',
-                    'question': 'Who is the best python programmer?',
-                    'options': {
-                        'A': 'Roel',
-                        'B': 'Caroline',
-                        'C': 'Santa Claus'
-                    },
-                    'solution': 'B'
-                },
-                {
-                    'id': '0004',
-                    'question': 'What is the airspeed velocity of an unladen swallow?',
-                    'options': {
-                        'A': 'I don\'t know that.',
-                        'B': 'Blue!',
-                        'C': 'That depends. Is it an African swallow or a European one?'
-                    },
-                    'solution': 'C',
-                    'time': 30
-                },
-                {
-                    'id': '0005',
-                    'question': 'Was this a fun quiz?',
-                    'options': {
-                        'A': 'Yes!',
-                        'B': 'No.'
-                    },
-                    'solution': 'B'
-                }
-            ])
+            # import from db with correct quizId
+            quizId = 1
+            newQuestion = Question()
+            quiz = newQuestion.createQuizWithQuestions(quizId)
 
-            self.server.handleNextQuestion()
-            self.server.waitAndSendScores()
+
+            self.server.setQuestionList(quiz)
+
+            #self.server.handleNextQuestion()
+            #self.server.waitAndSendScores()
+
+            # self.server.setQuestionList([  # list of (for now hard-coded) questions that the clients will answer
+            #     {
+            #         'id': '0001',
+            #         'question': 'What is the first letter of the alphabet?',
+            #         'options': {
+            #             'A': 'A',
+            #             'B': 'B',
+            #             'C': 'C',
+            #             'D': 'D'
+            #         },
+            #         'solution': 'A'
+            #     },
+            #     {
+            #         'id': '0002',
+            #         'question': 'What colour is the sky?',
+            #         'options': {
+            #             'A': 'Green',
+            #             'B': 'Red',
+            #             'C': 'Blue',
+            #             'D': 'brown'
+            #         },
+            #         'solution': 'C',
+            #         'time': 30
+            #     },
+            #     {
+            #         'id': '0003',
+            #         'question': 'Who is the best python programmer?',
+            #         'options': {
+            #             'A': 'Roel',
+            #             'B': 'Caroline',
+            #             'C': 'Santa Claus'
+            #         },
+            #         'solution': 'B'
+            #     },
+            #     {
+            #         'id': '0004',
+            #         'question': 'What is the airspeed velocity of an unladen swallow?',
+            #         'options': {
+            #             'A': 'I don\'t know that.',
+            #             'B': 'Blue!',
+            #             'C': 'That depends. Is it an African swallow or a European one?'
+            #         },
+            #         'solution': 'C',
+            #         'time': 30
+            #     },
+            #     {
+            #         'id': '0005',
+            #         'question': 'Was this a fun quiz?',
+            #         'options': {
+            #             'A': 'Yes!',
+            #             'B': 'No.'
+            #         },
+            #         'solution': 'B'
+            #     }
+            # ])
+
+            # self.server.handleNextQuestion()
+            # self.server.waitAndSendScores()
 
             # print(f'access: {self.server.access}')
             # print(f'ready: {self.server.ready}')
@@ -373,6 +382,7 @@ class HostQuizStartScreen(Frame):
             # print(f'current question: {self.server.currentQuestion}')
             # print(f'scores: {self.server.scores}')
             # print(f'answers: {self.server.answers}')
+
 
         # PROBLEM: new screen only shows AFTER players answer first question
         label1 = Label(self, text='Players are answering...', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
