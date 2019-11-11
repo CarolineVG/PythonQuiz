@@ -10,6 +10,8 @@ from Classes.Sockets import Server
 # global server var
 server = ''
 hostQuiz = 0
+createQuizId = 0
+
 
 # class QuizApp
 class QuizApp(Tk):
@@ -63,26 +65,69 @@ class CreateQuizScreen(Frame):
         # create quiz
         Frame.__init__(self, master)
 
-        def test():
-            # test Quiz Class
+        def saveQuiz():
+            q = quizValue.get()
+            print(f'new quiz: {q}')
 
             # create new Quiz
-            newQuiz = Quiz(1, 'test')
-            #newQuiz.addQuizToDatabase()
-            newQuiz.getDataFromDatabase()
+            newQuiz = Quiz()
+            newQuiz.setQuizName(q)
+            newQuiz.addQuizToDatabase()
 
-            # create new Question
-            newQuestion = Question(1, 'question', 2, 'a', 'b', 'c', 'd', 60, 10)
-            #newQuestion.addQuestionToDatabase()
+            # get id from new quiz
+            result = newQuiz.getIdFromQuizName(q)
+            global createQuizId
+            createQuizId = result[0]
+            print(createQuizId)
+
+            # change layout
+            button2 = Button(self, text='Add questions', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),
+                             command=lambda: master.switch_frame(CreateQuestionScreen)).pack()
+
+        quizValue = StringVar()
+
+        pinLabel = Label(self, text='Quiz', fg='black', font=('arial', 24, 'bold')).pack()
+
+        questionLabel = Label(self, text='Quiz Name*', fg='black', font=('arial', 16, 'bold')).pack()
+
+        questionInput = Entry(self, textvar=quizValue).pack()
+
+        button1 = Button(self, text='Save', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=saveQuiz).pack()
+
+        button3 = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
+
+
+# screen CREATE QUESTION QUIZ
+class CreateQuestionScreen(Frame):
+    # constructor
+    def __init__(self, master):
+        # create quiz
+        Frame.__init__(self, master)
+
+        def test():
+            # create new Quiz
+            print(f'Quiz Id: {createQuizId}')
+
+            q = questionValue.get()
+            a1 = answer1Value.get()
+            a2 = answer2Value.get()
+            a3 = answer3Value.get()
+            a4 = answer4Value.get()
+            s = solutionValue.get()
+
+            # create new Question: temp: 2 = solution
+            newQuestion = Question()
+            newQuestion.addQuestion(createQuizId, q, s, a1, a2, a3, a4, 60, 10)
+            newQuestion.addQuestionToDatabase()
             newQuestion.getQuestionFromDatabase()
 
             # to do: change hardcoded question to input from user
 
             # test: from database to json format to send to server
-            newQuestion.sendQuestionToServer()
-
-            s = Server("", 5000)
-            s.host()
+            # newQuestion.sendQuestionToServer()
+            #
+            # s = Server("", 5000)
+            # s.host()
 
             # server.addQuestion(question)
 
@@ -90,28 +135,16 @@ class CreateQuizScreen(Frame):
             #     'question'] + '", "options":' + json.dumps(question['options']) + ',"time":' + json.dumps(
             #     question['time']) + '}'
 
-            # q = questionValue.get()
-            # a1 = answer1Value.get()
-            # a2 = answer2Value.get()
-            # a3 = answer3Value.get()
-            # a4 = answer4Value.get()
-            # print(f'{q} ? {a1}, {a2}, {a3}, {a4}')
-            #
-            # # add to db
-            # db = Database()
-            # # id=1, quizid=1, solution = b (question b is correct)
-            # db.insertData(1, q, 'b', a1, a2, a3, a4)
-            # db.getData()
-            #
-            # conn = sqlite3.connect("Quiz.db")
-            # with conn:
-            #     cursor = conn.cursor()
+            # empty everything for new question
+            # TO DO...
+
 
         questionValue = StringVar()
         answer1Value = StringVar()
         answer2Value = StringVar()
         answer3Value = StringVar()
         answer4Value = StringVar()
+        solutionValue = StringVar()
 
         pinLabel = Label(self, text='Quiz', fg='black', font=('arial', 24, 'bold')).pack()
 
@@ -130,8 +163,14 @@ class CreateQuizScreen(Frame):
         answer4Label = Label(self, text='Answer 4', fg='black', font=('arial', 16, 'bold')).pack()
         answer4Input = Entry(self, textvar=answer4Value).pack()
 
-        button1 = Button(self, text='Next question', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=test).pack()
-        button2 = Button(self, text='Finish quiz', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold')).pack()
+        solutionLabel = Label(self, text='Correct answer', fg='black', font=('arial', 16, 'bold')).pack()
+        r1 = Radiobutton(self, text='1', variable=solutionValue, value='option1').pack()
+        r2 = Radiobutton(self, text='2', variable=solutionValue, value='option2').pack()
+        r3 = Radiobutton(self, text='3', variable=solutionValue, value='option3').pack()
+        r4 = Radiobutton(self, text='4', variable=solutionValue, value='option4').pack()
+
+        button1 = Button(self, text='Save and next question', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=test).pack()
+        button2 = Button(self, text='Finish quiz', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizScreen)).pack()
 
         button3 = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
 
@@ -266,64 +305,75 @@ class HostQuizStartScreen(Frame):
 
         def sendFirstQuestion():
 
-            self.server.setQuestionList([  # list of (for now hard-coded) questions that the clients will answer
-                {
-                    'id': '0001',
-                    'question': 'What is the first letter of the alphabet?',
-                    'options': {
-                        'A': 'A',
-                        'B': 'B',
-                        'C': 'C',
-                        'D': 'D'
-                    },
-                    'solution': 'A'
-                },
-                {
-                    'id': '0002',
-                    'question': 'What colour is the sky?',
-                    'options': {
-                        'A': 'Green',
-                        'B': 'Red',
-                        'C': 'Blue',
-                        'D': 'brown'
-                    },
-                    'solution': 'C',
-                    'time': 30
-                },
-                {
-                    'id': '0003',
-                    'question': 'Who is the best python programmer?',
-                    'options': {
-                        'A': 'Roel',
-                        'B': 'Caroline',
-                        'C': 'Santa Claus'
-                    },
-                    'solution': 'B'
-                },
-                {
-                    'id': '0004',
-                    'question': 'What is the airspeed velocity of an unladen swallow?',
-                    'options': {
-                        'A': 'I don\'t know that.',
-                        'B': 'Blue!',
-                        'C': 'That depends. Is it an African swallow or a European one?'
-                    },
-                    'solution': 'C',
-                    'time': 30
-                },
-                {
-                    'id': '0005',
-                    'question': 'Was this a fun quiz?',
-                    'options': {
-                        'A': 'Yes!',
-                        'B': 'No.'
-                    },
-                    'solution': 'B'
-                }
-            ])
+            # import from db with correct quizId
+            quizId = 1
+            newQuestion = Question()
+            quiz = newQuestion.createQuizWithQuestions(quizId)
 
-            self.server.handleNextQuestion()
-            self.server.waitAndSendScores()
+
+            self.server.setQuestionList(quiz)
+
+            #self.server.handleNextQuestion()
+            #self.server.waitAndSendScores()
+
+            # self.server.setQuestionList([  # list of (for now hard-coded) questions that the clients will answer
+            #     {
+            #         'id': '0001',
+            #         'question': 'What is the first letter of the alphabet?',
+            #         'options': {
+            #             'A': 'A',
+            #             'B': 'B',
+            #             'C': 'C',
+            #             'D': 'D'
+            #         },
+            #         'solution': 'A'
+            #     },
+            #     {
+            #         'id': '0002',
+            #         'question': 'What colour is the sky?',
+            #         'options': {
+            #             'A': 'Green',
+            #             'B': 'Red',
+            #             'C': 'Blue',
+            #             'D': 'brown'
+            #         },
+            #         'solution': 'C',
+            #         'time': 30
+            #     },
+            #     {
+            #         'id': '0003',
+            #         'question': 'Who is the best python programmer?',
+            #         'options': {
+            #             'A': 'Roel',
+            #             'B': 'Caroline',
+            #             'C': 'Santa Claus'
+            #         },
+            #         'solution': 'B'
+            #     },
+            #     {
+            #         'id': '0004',
+            #         'question': 'What is the airspeed velocity of an unladen swallow?',
+            #         'options': {
+            #             'A': 'I don\'t know that.',
+            #             'B': 'Blue!',
+            #             'C': 'That depends. Is it an African swallow or a European one?'
+            #         },
+            #         'solution': 'C',
+            #         'time': 30
+            #     },
+            #     {
+            #         'id': '0005',
+            #         'question': 'Was this a fun quiz?',
+            #         'options': {
+            #             'A': 'Yes!',
+            #             'B': 'No.'
+            #         },
+            #         'solution': 'B'
+            #     }
+            # ])
+
+            # self.server.handleNextQuestion()
+            # self.server.waitAndSendScores()
 
             # print(f'access: {self.server.access}')
             # print(f'ready: {self.server.ready}')
@@ -332,6 +382,7 @@ class HostQuizStartScreen(Frame):
             # print(f'current question: {self.server.currentQuestion}')
             # print(f'scores: {self.server.scores}')
             # print(f'answers: {self.server.answers}')
+
 
         # PROBLEM: new screen only shows AFTER players answer first question
         label1 = Label(self, text='Players are answering...', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)

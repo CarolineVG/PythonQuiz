@@ -23,6 +23,7 @@ class Server:
         self.currentQuestion = 0 #our progress into the quiz
         self.scores = {} #dictionary of scores
         self.answers = 0 #a counter that keeps track of how many clients have answered already. Resets with every new question.
+        self.endMessage = "Thank you for playing this Quiz!"
 
     def host(self):
         self.access = True
@@ -34,11 +35,10 @@ class Server:
         s.bind((self.ip, self.port))
         s.listen(5)
         while True:
-            print("loop")
             clientsocket, address = s.accept()
             if self.access == False:
                 #send back message to client so the client will close connection (I can't figure out how to do it from here)
-                sendToClient(clientSocket, '{"type":"connection refused"}')
+                self.sendToClient(clientSocket, '{"type":"connection refused"}')
             else:
                 self.clients.add(clientsocket)
             print(f"{len(self.clients)} players have connected.")
@@ -63,20 +63,24 @@ class Server:
             self.sendToClient(c, json)
 
     def sendQuestion(self, client, question):
-        if 'time' in question:
-            question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"time":'+json.dumps(question['time'])+'}'
+        if 'score' in question:
+            score = question['score']
         else:
-            question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+'}'
+            score = 10
+        if 'time' in question:
+            question = '{"type":"question", "sender": "Host", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"time":'+json.dumps(question['time'])+',"score":'+str(score)+'}'
+        else:
+            question = '{"type":"question", "sender": "Host", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"score":'+str(score)+'}'
         self.sendToClient(client, question)
 
-    def updateScores(self, name, answer, solution):
+    def updateScores(self, name, answer, solution, score):
         #check if the answer was correct
         if answer == solution:
             #check if client is already in the scores
             if name in self.scores:
-                self.scores[name] = self.scores.get(name) + 1
+                self.scores[name] = self.scores.get(name) + score
             else:
-                self.scores[name] = 1
+                self.scores[name] = score
         elif name not in self.scores:
             self.scores[name] = 0
 
@@ -109,7 +113,7 @@ class Server:
                 
                 self.answers = self.answers + 1
 
-                self.updateScores(answer["sender"], answer["answer"], solution)
+                self.updateScores(answer["sender"], answer["answer"], solution, answer["score"])
                 
                 if self.everyoneAnswered():
                     #all players have answered.
@@ -164,7 +168,6 @@ class Server:
         self.receiveAnswer(client, self.questionList[position]['solution'])
         if self.ready:
             time.sleep(1)
-            print("Everyone has answered")
             return
                 
     def handleNextQuestion(self):
@@ -189,10 +192,16 @@ class Server:
         else:
             return False
 
-    '''
-    TO DO:
-        A method that ends the quiz. (this required changes on the client side too)
-    '''
+    def setEndMessage(self, string):
+        self.endMessage = string
+        
+    def endQuiz(self): #send an end message to the other programs. They then do whatever they want with it.
+        message = '{"type":"end", "scoreboard":'+json.dumps(self.scores)+', "endMessage":"'+self.endMessage+'"}'
+        print(message)
+        self.sendToAll(message)
+        for c in self.clients:
+            print(str(c))
+            c.close()
 
 class Client:
     def __init__(self, ip, port):
@@ -209,6 +218,8 @@ class Client:
         self.lastMessage = None
         self.newQuestion = None
         self.newScores = None
+        self.ended = False
+        self.endMessage = None
     
     def join(self): #method for clients, may remove it later
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -229,6 +240,9 @@ class Client:
         return top5
 
     def listen(self):
+        self.newQuestion = None
+        self.newScores = None
+        
         fullMessage = b''
         newMessage = True
         while True:
@@ -250,12 +264,14 @@ class Client:
                 if message["type"] == "question":
                     self.newQuestion = message
                     self.answered = False
-                    if 'time' in message:
-                        x = threading.Thread(target=self.timer, args=([message['time']]))
-                        x.start()
                     break
                 if message["type"] == "scores":
                     self.newScores = message["scoreboard"]
+                    break
+                if message["type"] == "end":
+                    self.ended = True
+                    self.newScores = message["scoreboard"]
+                    self.endMessage = message["endMessage"]
                     break
                     
     def getQuestion(self):
@@ -272,15 +288,21 @@ class Client:
             print("No question was asked")
             return None
 
+    def getQuestionScore(self):
+        if self.newQuestion != None:
+            return self.newQuestion["score"]
+        else:
+            print("No question was asked")
+            return None
+
     def answer(self, answer):
         if self.newQuestion != None:
-            answer = answer.upper()
             if answer == False or answer == None or answer == "out of time":
-                answer = '{"sender":"'+self.name+'", "answer":"out of time"}'
-            elif answer == "A" or answer == "B" or answer == "C" or answer == "D":
-                answer = '{"sender":"'+self.name+'", "answer":"'+answer+'"}'
+                answer = '{"sender":"'+self.name+'", "answer":"out of time", "score":'+str(self.getQuestionScore())+'}'
+            elif answer == "option1" or answer == "option2" or answer == "option3" or answer == "option4":
+                answer = '{"sender":"'+self.name+'", "answer":"'+answer+'", "score":'+str(self.getQuestionScore())+'}'
             else:
-                print("Please choose between A, B, C or D")
+                print("Not an option")
                 return
             answer = pickle.dumps(answer)
             answer = bytes(f'{len(answer):<{self.headerSize}}', "utf-8") + answer
@@ -315,38 +337,157 @@ class Client:
             print("No scores have been send")
             return None
 
-    def end():
+    def getEndMessage(self):
+        return self.endMessage
+
+    def end(self):
         self.server.close()
 
-c = Client("",5000)
+switch = input("Server? ")
+if switch == "yes" or switch == "y":
+    s = Server("",5000)
+    s.host()
+    input("press enter to stop hosting")
+    s.stopHosting()
 
-input("press enter to join")
-c.join()
+    s.setQuestionList([ #list of (for now hard-coded) questions that the clients will answer
+        {
+            'question': 'What is the first letter of the alphabet?',
+            'options':{
+                'option1':'A',
+                'option2':'B',
+                'option3':'C',
+                'option4':'D'
+            },
+            'solution':'option1'
+        },
+        {
+            'question': 'What colour is the sky?',
+            'options':{
+                'option1':'Green',
+                'option2':'Red',
+                'option3':'Blue',
+                'option4':'brown'
+            },
+            'solution':'option3',
+            'time':30,
+            'score':20
+        },
+        {
+            'question': 'Who is the best python programmer?',
+            'options':{
+                'option1':'Roel',
+                'option2':'Caroline',
+                'option3':'Santa Claus'
+            },
+            'solution':'option2',
+            'score':5
+        },
+        {
+            'question': 'What is the airspeed velocity of an unladen swallow?',
+            'options':{
+                'option1':'I don\'t know that.',
+                'option2':'Blue!',
+                'option3':'That depends. Is it an African swallow or a European one?'
+            },
+            'solution':'option3',
+            'time':30
+        },
+        {
+            'question': 'Was this a fun quiz?',
+            'options':{
+                'option1':'Yes!',
+                'option2':'No.'
+            },
+            'solution':'option2'
+        }
+    ])
 
-name = input("who are you?")
-c.setName(name)
-input("press enter to listen to the server")
+    s.handleNextQuestion()
+    s.waitAndSendScores()
 
-c.listen()
-print("done listening")
-print(c.lastMessage)
+    s.handleNextQuestion()
+    s.waitAndSendScores()
 
-print("press enter to see the question")
-print(c.getQuestion())
-print(c.getQuestionOptions())
+    s.handleNextQuestion()
+    s.waitAndSendScores()
 
-print("the timer is:")
-print(c.getTimer())
+    s.endQuiz()
 
-print("")
-c.answer("a")
-c.listen()
-print("done listening")
-print(c.lastMessage)
+else:
+    c = Client("",5000)
 
-print("press enter to see the question")
-print(c.getYourScore())
-print(c.getScores())
+    input("press enter to join")
+    c.join()
+
+    name = input("who are you?")
+    c.setName(name)
+    input("press enter to listen to the server")
+
+    c.listen()
+    print("done listening")
+    print(c.lastMessage)
+    print(c.getQuestion())
+    print(c.getQuestionOptions())
+
+    print("the timer is:")
+    print(c.getTimer())
+
+    print("")
+    c.answer("option1")
+    
+    print("listening")
+    c.listen()
+    print("done listening")
+    print(c.getYourScore())
+    print(c.getScores())
 
 
+    c.listen()
+    print("done listening")
+    print(c.lastMessage)
+    print(c.getQuestion())
+    print(c.getQuestionOptions())
+    print(c.getQuestionScore())
+
+    print("the timer is:")
+    print(c.getTimer())
+
+    print("")
+    c.answer("option3")
+    
+    print("listening")
+    c.listen()
+    print("done listening")
+    print(c.getYourScore())
+    print(c.getScores())
+
+
+    c.listen()
+    print("done listening")
+    print(c.lastMessage)
+    print(c.getQuestion())
+    print(c.getQuestionOptions())
+    print(c.getQuestionScore())
+
+    print("the timer is:")
+    print(c.getTimer())
+
+    print("")
+    c.answer("option2")
+    
+    print("listening")
+    c.listen()
+    print("done listening")
+    print(c.getYourScore())
+    print(c.getScores())
+
+    
+    print("listening")
+    c.listen()
+    print(c.ended)
+    print(c.getYourScore())
+    print(c.getScores())
+    print(c.endMessage)
+    c.end()
 

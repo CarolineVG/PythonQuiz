@@ -23,29 +23,22 @@ class Server:
         self.currentQuestion = 0 #our progress into the quiz
         self.scores = {} #dictionary of scores
         self.answers = 0 #a counter that keeps track of how many clients have answered already. Resets with every new question.
+        self.endMessage = "Thank you for playing this Quiz!"
 
     def host(self):
         self.access = True
         a = threading.Thread(target=self.connectClients)
         a.start()
 
-    def sendToClient(self, client, json):
-        message = pickle.dumps(json)
-        message = bytes(f'{len(message):<{self.headerSize}}', "utf-8") + message
-        client.send(message)
-
-
     def connectClients(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((self.ip, self.port))
         s.listen(5)
         while True:
-            print('loops')
             clientsocket, address = s.accept()
             if self.access == False:
-                print("conn refused")
                 #send back message to client so the client will close connection (I can't figure out how to do it from here)
-                self.sendToClient(self.clientSocket, '{"type":"connection refused"}')
+                self.sendToClient(clientSocket, '{"type":"connection refused"}')
             else:
                 self.clients.add(clientsocket)
             print(f"{len(self.clients)} players have connected.")
@@ -60,26 +53,34 @@ class Server:
             print("No players were found.")
             sys.exit(0)
 
+    def sendToClient(self, client, json):
+        message = pickle.dumps(json)
+        message = bytes(f'{len(message):<{self.headerSize}}', "utf-8") + message
+        client.send(message)
 
     def sendToAll(self, json):
         for c in self.clients:
             self.sendToClient(c, json)
 
     def sendQuestion(self, client, question):
-        if 'time' in question:
-            question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"time":'+json.dumps(question['time'])+'}'
+        if 'score' in question:
+            score = question['score']
         else:
-            question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+'}'
+            score = 10
+        if 'time' in question:
+            question = '{"type":"question", "sender": "Host", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"time":'+json.dumps(question['time'])+',"score":'+str(score)+'}'
+        else:
+            question = '{"type":"question", "sender": "Host", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"score":'+str(score)+'}'
         self.sendToClient(client, question)
 
-    def updateScores(self, name, answer, solution):
+    def updateScores(self, name, answer, solution, score):
         #check if the answer was correct
         if answer == solution:
             #check if client is already in the scores
             if name in self.scores:
-                self.scores[name] = self.scores.get(name) + 1
+                self.scores[name] = self.scores.get(name) + score
             else:
-                self.scores[name] = 1
+                self.scores[name] = score
         elif name not in self.scores:
             self.scores[name] = 0
 
@@ -112,7 +113,7 @@ class Server:
                 
                 self.answers = self.answers + 1
 
-                self.updateScores(answer["sender"], answer["answer"], solution)
+                self.updateScores(answer["sender"], answer["answer"], solution, answer["score"])
                 
                 if self.everyoneAnswered():
                     #all players have answered.
@@ -167,7 +168,6 @@ class Server:
         self.receiveAnswer(client, self.questionList[position]['solution'])
         if self.ready:
             time.sleep(1)
-            print("Everyone has answered")
             return
                 
     def handleNextQuestion(self):
@@ -192,11 +192,16 @@ class Server:
         else:
             return False
 
-    '''
-    TO DO:
-        A method that ends the quiz. (this required changes on the client side too)
-    '''
-
+    def setEndMessage(self, string):
+        self.endMessage = string
+        
+    def endQuiz(self): #send an end message to the other programs. They then do whatever they want with it.
+        message = '{"type":"end", "scoreboard":'+json.dumps(self.scores)+', "endMessage":"'+self.endMessage+'"}'
+        print(message)
+        self.sendToAll(message)
+        for c in self.clients:
+            print(str(c))
+            c.close()
 
 class Client:
     def __init__(self, ip, port):
@@ -213,13 +218,15 @@ class Client:
         self.lastMessage = None
         self.newQuestion = None
         self.newScores = None
+        self.ended = False
+        self.endMessage = None
     
     def join(self): #method for clients, may remove it later
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.connect((self.ip, self.port))
         print("connected to a quiz host.")
 
-    def setName(self, string): #now you may say that this method is completely useless, but I'll have you know that you smell and your mom is gay
+    def setName(self, string):
         self.name = string
 
     def getName(self, string):
@@ -233,6 +240,9 @@ class Client:
         return top5
 
     def listen(self):
+        self.newQuestion = None
+        self.newScores = None
+        
         fullMessage = b''
         newMessage = True
         while True:
@@ -254,12 +264,14 @@ class Client:
                 if message["type"] == "question":
                     self.newQuestion = message
                     self.answered = False
-                    if 'time' in message:
-                        x = threading.Thread(target=self.timer, args=([message['time']]))
-                        x.start()
                     break
                 if message["type"] == "scores":
                     self.newScores = message["scoreboard"]
+                    break
+                if message["type"] == "end":
+                    self.ended = True
+                    self.newScores = message["scoreboard"]
+                    self.endMessage = message["endMessage"]
                     break
                     
     def getQuestion(self):
@@ -276,15 +288,21 @@ class Client:
             print("No question was asked")
             return None
 
+    def getQuestionScore(self):
+        if self.newQuestion != None:
+            return self.newQuestion["score"]
+        else:
+            print("No question was asked")
+            return None
+
     def answer(self, answer):
         if self.newQuestion != None:
-            answer = answer.upper()
             if answer == False or answer == None or answer == "out of time":
-                answer = '{"sender":"'+self.name+'", "answer":"out of time"}'
-            elif answer == "A" or answer == "B" or answer == "C" or answer == "D":
-                answer = '{"sender":"'+self.name+'", "answer":"'+answer+'"}'
+                answer = '{"sender":"'+self.name+'", "answer":"out of time", "score":'+str(self.getQuestionScore())+'}'
+            elif answer == "option1" or answer == "option2" or answer == "option3" or answer == "option4":
+                answer = '{"sender":"'+self.name+'", "answer":"'+answer+'", "score":'+str(self.getQuestionScore())+'}'
             else:
-                print("Please choose between A, B, C or D")
+                print("Not an option")
                 return
             answer = pickle.dumps(answer)
             answer = bytes(f'{len(answer):<{self.headerSize}}', "utf-8") + answer
@@ -319,7 +337,10 @@ class Client:
             print("No scores have been send")
             return None
 
-    def end():
+    def getEndMessage(self):
+        return self.endMessage
+
+    def end(self):
         self.server.close()
 
 
