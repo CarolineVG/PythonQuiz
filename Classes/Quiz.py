@@ -3,9 +3,8 @@ from Classes.Database import Database
 
 
 class Quiz:
-    def __init__(self, id, quizName):
-        self.id = id
-        self.quizName = quizName
+    def __init__(self):
+        self.quizName = ''
 
     def __init__(self):
         self.id = id
@@ -20,6 +19,9 @@ class Quiz:
 
         conn.commit()
 
+    def setQuizName(self, value):
+        self.quizName = value
+
     def getDataFromDatabase(self):
         db = Database()
         conn = db.getConnection()
@@ -32,3 +34,15 @@ class Quiz:
 
         return records
 
+    def getIdFromQuizName(self, val):
+        quizName = val
+        db = Database()
+        conn = db.getConnection()
+        cursor = conn.cursor()
+
+        # get data from db
+        # WHERE: you need to pass the var as a tuple
+        cursor.execute('SELECT Id FROM Quizes WHERE QuizName = ?', (quizName,))
+        records = cursor.fetchone()
+
+        return records
