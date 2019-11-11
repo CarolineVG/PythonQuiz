@@ -7,7 +7,18 @@ from Classes.Database import Database
 class Question:
     questionNumber = 0
 
-    def __init__(self, quizId, question, solution, answer1, answer2, answer3, answer4, timer, points):
+    def __init__(self):
+        self.quizId = 0
+        self.question = ''
+        self.solution = 0
+        self.answer1 = ''
+        self.answer2 = ''
+        self.answer3 = ''
+        self.answer4 = ''
+        self.timer = 0
+        self.points = 0
+
+    def addQuestion(self, quizId, question, solution, answer1, answer2, answer3, answer4, timer, points):
         self.quizId = quizId
         self.question = question
         self.solution = solution
@@ -18,7 +29,6 @@ class Question:
         self.timer = timer
         self.points = points
 
-    # to do
     def addQuestionToDatabase(self):
         db = Database()
         conn = db.getConnection()
