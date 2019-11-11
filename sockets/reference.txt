@@ -15,6 +15,10 @@ server.setQuestionList([listOfDictionaries])
 # add another question to the question list
 server.addQuestion(dictionary)
 
+# in the questions you can specify the key 'time' to specify how much time they have to answer it. (seconds)
+
+# in the questions you can specify the key 'score' to specify how much score the question is worth. If it's not defined it will be 10 by default
+
 # send the next question to the clients and collect the answers
 server.handleNextQuestion()
 
@@ -49,9 +53,11 @@ server.everyoneAnswered()
 # check if we're at the last question. returns True or False
 server.lastQuestion()
 
-# end the quiz
-A method for this will be made in the future. Rightnow it ends automaticly when players receive their last question.
+# set the end message that will be send to clients when the quiz is ended
+server.setEndMessage()
 
+# end the quiz. Sends end message and final scores to the clients before closing the connection
+server.endQuiz()
 
 
 ### client
@@ -81,6 +87,9 @@ client.getQuestion()
 # get the answer options (dict)
 client.getQuestionOptions()
 
+# get how much score the question is worth
+client.getQuestionScore()
+
 # answer a question. (for now a string. Just a, b, c or d)
 client.answer(option)
 
@@ -103,5 +112,11 @@ client.getYourScore()
 #get sorted list of all scores:
 client.getScores()
 
-#end quiz
+# check if the server has ended the quiz. False or True
+client.ended
 
+# get the end message.
+client.getEndMessage()
+
+#end quiz. This closes the connection
+client.end()
