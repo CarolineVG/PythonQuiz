@@ -68,9 +68,9 @@ class Server:
         else:
             score = 10
         if 'time' in question:
-            question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"time":'+json.dumps(question['time'])+',"score":'+str(score)+'}'
+            question = '{"type":"question", "sender": "Host", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"time":'+json.dumps(question['time'])+',"score":'+str(score)+'}'
         else:
-            question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"score":'+str(score)+'}'
+            question = '{"type":"question", "sender": "Host", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"score":'+str(score)+'}'
         self.sendToClient(client, question)
 
     def updateScores(self, name, answer, solution, score):
@@ -297,13 +297,12 @@ class Client:
 
     def answer(self, answer):
         if self.newQuestion != None:
-            answer = answer.upper()
             if answer == False or answer == None or answer == "out of time":
                 answer = '{"sender":"'+self.name+'", "answer":"out of time", "score":'+str(self.getQuestionScore())+'}'
-            elif answer == "A" or answer == "B" or answer == "C" or answer == "D":
+            elif answer == "option1" or answer == "option2" or answer == "option3" or answer == "option4":
                 answer = '{"sender":"'+self.name+'", "answer":"'+answer+'", "score":'+str(self.getQuestionScore())+'}'
             else:
-                print("Please choose between A, B, C or D")
+                print("Not an option")
                 return
             answer = pickle.dumps(answer)
             answer = bytes(f'{len(answer):<{self.headerSize}}', "utf-8") + answer
@@ -353,59 +352,54 @@ if switch == "yes" or switch == "y":
 
     s.setQuestionList([ #list of (for now hard-coded) questions that the clients will answer
         {
-            'id': '0001',
             'question': 'What is the first letter of the alphabet?',
             'options':{
-                'A':'A',
-                'B':'B',
-                'C':'C',
-                'D':'D'
+                'option1':'A',
+                'option2':'B',
+                'option3':'C',
+                'option4':'D'
             },
-            'solution':'A'
+            'solution':'option1'
         },
         {
-            'id': '0002',
             'question': 'What colour is the sky?',
             'options':{
-                'A':'Green',
-                'B':'Red',
-                'C':'Blue',
-                'D':'brown'
+                'option1':'Green',
+                'option2':'Red',
+                'option3':'Blue',
+                'option4':'brown'
             },
-            'solution':'C',
+            'solution':'option3',
             'time':30,
             'score':20
         },
         {
-            'id': '0003',
             'question': 'Who is the best python programmer?',
             'options':{
-                'A':'Roel',
-                'B':'Caroline',
-                'C':'Santa Claus'
+                'option1':'Roel',
+                'option2':'Caroline',
+                'option3':'Santa Claus'
             },
-            'solution':'B',
+            'solution':'option2',
             'score':5
         },
         {
-            'id': '0004',
             'question': 'What is the airspeed velocity of an unladen swallow?',
             'options':{
-                'A':'I don\'t know that.',
-                'B':'Blue!',
-                'C':'That depends. Is it an African swallow or a European one?'
+                'option1':'I don\'t know that.',
+                'option2':'Blue!',
+                'option3':'That depends. Is it an African swallow or a European one?'
             },
-            'solution':'C',
+            'solution':'option3',
             'time':30
         },
         {
-            'id': '0005',
             'question': 'Was this a fun quiz?',
             'options':{
-                'A':'Yes!',
-                'B':'No.'
+                'option1':'Yes!',
+                'option2':'No.'
             },
-            'solution':'B'
+            'solution':'option2'
         }
     ])
 
@@ -440,7 +434,7 @@ else:
     print(c.getTimer())
 
     print("")
-    c.answer("a")
+    c.answer("option1")
     
     print("listening")
     c.listen()
@@ -460,7 +454,7 @@ else:
     print(c.getTimer())
 
     print("")
-    c.answer("c")
+    c.answer("option3")
     
     print("listening")
     c.listen()
@@ -480,7 +474,7 @@ else:
     print(c.getTimer())
 
     print("")
-    c.answer("b")
+    c.answer("option2")
     
     print("listening")
     c.listen()

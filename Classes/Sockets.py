@@ -38,7 +38,7 @@ class Server:
             clientsocket, address = s.accept()
             if self.access == False:
                 #send back message to client so the client will close connection (I can't figure out how to do it from here)
-                sendToClient(clientSocket, '{"type":"connection refused"}')
+                self.sendToClient(clientSocket, '{"type":"connection refused"}')
             else:
                 self.clients.add(clientsocket)
             print(f"{len(self.clients)} players have connected.")
@@ -63,20 +63,24 @@ class Server:
             self.sendToClient(c, json)
 
     def sendQuestion(self, client, question):
-        if 'time' in question:
-            question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"time":'+json.dumps(question['time'])+'}'
+        if 'score' in question:
+            score = question['score']
         else:
-            question = '{"type":"question", "sender": "Host", "id":"'+question['id']+'", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+'}'
+            score = 10
+        if 'time' in question:
+            question = '{"type":"question", "sender": "Host", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"time":'+json.dumps(question['time'])+',"score":'+str(score)+'}'
+        else:
+            question = '{"type":"question", "sender": "Host", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"score":'+str(score)+'}'
         self.sendToClient(client, question)
 
-    def updateScores(self, name, answer, solution):
+    def updateScores(self, name, answer, solution, score):
         #check if the answer was correct
         if answer == solution:
             #check if client is already in the scores
             if name in self.scores:
-                self.scores[name] = self.scores.get(name) + 1
+                self.scores[name] = self.scores.get(name) + score
             else:
-                self.scores[name] = 1
+                self.scores[name] = score
         elif name not in self.scores:
             self.scores[name] = 0
 
@@ -109,7 +113,7 @@ class Server:
                 
                 self.answers = self.answers + 1
 
-                self.updateScores(answer["sender"], answer["answer"], solution)
+                self.updateScores(answer["sender"], answer["answer"], solution, answer["score"])
                 
                 if self.everyoneAnswered():
                     #all players have answered.
@@ -222,7 +226,7 @@ class Client:
         self.server.connect((self.ip, self.port))
         print("connected to a quiz host.")
 
-    def setName(self, string): #now you may say that this method is completely useless, but I'll have you know that you smell and your mom is gay
+    def setName(self, string):
         self.name = string
 
     def getName(self, string):
@@ -260,9 +264,6 @@ class Client:
                 if message["type"] == "question":
                     self.newQuestion = message
                     self.answered = False
-                    if 'time' in message:
-                        x = threading.Thread(target=self.timer, args=([message['time']]))
-                        x.start()
                     break
                 if message["type"] == "scores":
                     self.newScores = message["scoreboard"]
@@ -287,15 +288,21 @@ class Client:
             print("No question was asked")
             return None
 
+    def getQuestionScore(self):
+        if self.newQuestion != None:
+            return self.newQuestion["score"]
+        else:
+            print("No question was asked")
+            return None
+
     def answer(self, answer):
         if self.newQuestion != None:
-            answer = answer.upper()
             if answer == False or answer == None or answer == "out of time":
-                answer = '{"sender":"'+self.name+'", "answer":"out of time"}'
-            elif answer == "A" or answer == "B" or answer == "C" or answer == "D":
-                answer = '{"sender":"'+self.name+'", "answer":"'+answer+'"}'
+                answer = '{"sender":"'+self.name+'", "answer":"out of time", "score":'+str(self.getQuestionScore())+'}'
+            elif answer == "option1" or answer == "option2" or answer == "option3" or answer == "option4":
+                answer = '{"sender":"'+self.name+'", "answer":"'+answer+'", "score":'+str(self.getQuestionScore())+'}'
             else:
-                print("Please choose between A, B, C or D")
+                print("Not an option")
                 return
             answer = pickle.dumps(answer)
             answer = bytes(f'{len(answer):<{self.headerSize}}', "utf-8") + answer
@@ -329,6 +336,9 @@ class Client:
         else:
             print("No scores have been send")
             return None
+
+    def getEndMessage(self):
+        return self.endMessage
 
     def end(self):
         self.server.close()
