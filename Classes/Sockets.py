@@ -23,29 +23,22 @@ class Server:
         self.currentQuestion = 0 #our progress into the quiz
         self.scores = {} #dictionary of scores
         self.answers = 0 #a counter that keeps track of how many clients have answered already. Resets with every new question.
+        self.endMessage = "Thank you for playing this Quiz!"
 
     def host(self):
         self.access = True
         a = threading.Thread(target=self.connectClients)
         a.start()
 
-    def sendToClient(self, client, json):
-        message = pickle.dumps(json)
-        message = bytes(f'{len(message):<{self.headerSize}}', "utf-8") + message
-        client.send(message)
-
-
     def connectClients(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((self.ip, self.port))
         s.listen(5)
         while True:
-            print('loops')
             clientsocket, address = s.accept()
             if self.access == False:
-                print("conn refused")
                 #send back message to client so the client will close connection (I can't figure out how to do it from here)
-                self.sendToClient(self.clientSocket, '{"type":"connection refused"}')
+                sendToClient(clientSocket, '{"type":"connection refused"}')
             else:
                 self.clients.add(clientsocket)
             print(f"{len(self.clients)} players have connected.")
@@ -60,6 +53,10 @@ class Server:
             print("No players were found.")
             sys.exit(0)
 
+    def sendToClient(self, client, json):
+        message = pickle.dumps(json)
+        message = bytes(f'{len(message):<{self.headerSize}}', "utf-8") + message
+        client.send(message)
 
     def sendToAll(self, json):
         for c in self.clients:
@@ -167,7 +164,6 @@ class Server:
         self.receiveAnswer(client, self.questionList[position]['solution'])
         if self.ready:
             time.sleep(1)
-            print("Everyone has answered")
             return
                 
     def handleNextQuestion(self):
@@ -192,11 +188,16 @@ class Server:
         else:
             return False
 
-    '''
-    TO DO:
-        A method that ends the quiz. (this required changes on the client side too)
-    '''
-
+    def setEndMessage(self, string):
+        self.endMessage = string
+        
+    def endQuiz(self): #send an end message to the other programs. They then do whatever they want with it.
+        message = '{"type":"end", "scoreboard":'+json.dumps(self.scores)+', "endMessage":"'+self.endMessage+'"}'
+        print(message)
+        self.sendToAll(message)
+        for c in self.clients:
+            print(str(c))
+            c.close()
 
 class Client:
     def __init__(self, ip, port):
@@ -213,6 +214,8 @@ class Client:
         self.lastMessage = None
         self.newQuestion = None
         self.newScores = None
+        self.ended = False
+        self.endMessage = None
     
     def join(self): #method for clients, may remove it later
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -233,6 +236,9 @@ class Client:
         return top5
 
     def listen(self):
+        self.newQuestion = None
+        self.newScores = None
+        
         fullMessage = b''
         newMessage = True
         while True:
@@ -260,6 +266,11 @@ class Client:
                     break
                 if message["type"] == "scores":
                     self.newScores = message["scoreboard"]
+                    break
+                if message["type"] == "end":
+                    self.ended = True
+                    self.newScores = message["scoreboard"]
+                    self.endMessage = message["endMessage"]
                     break
                     
     def getQuestion(self):
@@ -319,7 +330,7 @@ class Client:
             print("No scores have been send")
             return None
 
-    def end():
+    def end(self):
         self.server.close()
 
 
