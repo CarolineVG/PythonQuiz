@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d1e4dddb-1ee3-4bee-8a56-692bb7e96a81" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Classes/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes/Question.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Question.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Classes/Screen.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Screen.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Quiz.db" beforeDir="false" afterPath="$PROJECT_DIR$/Quiz.db" afterDir="false" />
     </list>
@@ -28,66 +27,16 @@
     <expand />
     <select />
   </component>
-  <component name="DockManager">
-    <window id="1">
-      <content type="file-editors">
-        <state>
-          <leaf>
-            <file pinned="false" current-in-tab="true">
-              <entry file="file://$PROJECT_DIR$/sockets/reference.txt">
-                <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="300">
-                    <caret line="12" column="44" lean-forward="true" selection-start-line="12" selection-end-line="12" selection-end-column="44" />
-                  </state>
-                </provider>
-              </entry>
-            </file>
-          </leaf>
-        </state>
-      </content>
-    </window>
-  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Classes/Screen.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="332">
-              <caret line="315" column="13" selection-start-line="315" selection-start-column="13" selection-end-line="315" selection-end-column="13" />
+            <state relative-caret-position="376">
+              <caret line="266" column="21" selection-start-line="266" selection-start-column="21" selection-end-line="266" selection-end-column="21" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
-                <element signature="e#311#1095#0" />
-                <element signature="e#1141#1928#0" />
-                <element signature="e#1987#3340#0" />
-                <element signature="e#3403#6199#0" />
-                <element signature="e#6264#7494#0" />
-                <element signature="e#7549#8578#0" />
-                <element signature="e#8661#10896#0" />
-                <element signature="e#14044#14961#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Classes/Sockets.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5325">
-              <caret line="306" lean-forward="true" selection-start-line="306" selection-end-line="306" />
-              <folding>
-                <element signature="e#0#13#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Classes/Question.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="382">
-              <caret line="95" column="34" lean-forward="true" selection-start-line="95" selection-start-column="34" selection-end-line="95" selection-end-column="34" />
-              <folding>
-                <element signature="e#17#28#0" expanded="true" />
+                <element signature="e#2044#3397#0" />
               </folding>
             </state>
           </provider>
@@ -109,6 +58,7 @@
       <find>host</find>
       <find>lol</find>
       <find>sendQuestion</find>
+      <find>HostQuizScreen</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -150,7 +100,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -177,6 +126,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -185,7 +135,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/testquiz" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Ignored.Files" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -205,6 +155,28 @@
     </option>
   </component>
   <component name="RunManager" selected="Python.home">
+    <configuration name="Sockets" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="PythonQuiz" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Classes" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Classes/Sockets.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="client" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="PythonQuiz" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -293,35 +265,13 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="sockets" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="PythonQuiz" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sockets" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sockets/sockets.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.home" />
+        <item itemvalue="Python.Sockets" />
         <item itemvalue="Python.server" />
         <item itemvalue="Python.mainWithDbAndClasses" />
         <item itemvalue="Python.client" />
-        <item itemvalue="Python.sockets" />
       </list>
     </recent_temporary>
   </component>
@@ -354,7 +304,11 @@
       <workItem from="1573376937123" duration="5016000" />
       <workItem from="1573382453933" duration="56000" />
       <workItem from="1573477360592" duration="3917000" />
-      <workItem from="1573491790549" duration="5073000" />
+      <workItem from="1573491790549" duration="5503000" />
+      <workItem from="1573574988466" duration="1551000" />
+      <workItem from="1573735626923" duration="886000" />
+      <workItem from="1573740866654" duration="2307000" />
+      <workItem from="1574002062859" duration="40000" />
     </task>
     <task id="LOCAL-00001" summary="Add basic home and quiz screen">
       <created>1570805045185</created>
@@ -367,7 +321,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="64289000" />
+    <option name="totallyTimeSpent" value="69503000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -382,12 +336,12 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.496208" visible="true" weight="0.13859275" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.496208" visible="true" weight="0.14498934" />
       <window_info id="Structure" order="1" sideWeight="0.503792" side_tool="true" weight="0.13859275" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.16251354" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.23943663" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -396,7 +350,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.31960997" />
       <window_info anchor="bottom" id="Database Changes" order="9" weight="0.32936078" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.26435536" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.20476706" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.32936078" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -414,12 +368,13 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/PythonQuiz$server.coverage" NAME="server Coverage Results" MODIFIED="1573138166355" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/sockets" />
-    <SUITE FILE_PATH="coverage/PythonQuiz$home.coverage" NAME="home Coverage Results" MODIFIED="1573496820414" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PythonQuiz$home.coverage" NAME="home Coverage Results" MODIFIED="1573744482387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/PythonQuiz$main.coverage" NAME="main Coverage Results" MODIFIED="1571564186014" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testquiz" />
     <SUITE FILE_PATH="coverage/PythonQuiz$sockets.coverage" NAME="sockets Coverage Results" MODIFIED="1572947176514" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/sockets" />
     <SUITE FILE_PATH="coverage/PythonQuiz$client.coverage" NAME="client Coverage Results" MODIFIED="1572947844439" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/sockets" />
     <SUITE FILE_PATH="coverage/PythonQuiz$test.coverage" NAME="test Coverage Results" MODIFIED="1570716562924" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/PythonQuiz$mainWithDbAndClasses.coverage" NAME="mainWithDbAndClasses Coverage Results" MODIFIED="1572948081725" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testquiz" />
+    <SUITE FILE_PATH="coverage/PythonQuiz$Sockets.coverage" NAME="Sockets Coverage Results" MODIFIED="1573575511685" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Classes" />
     <SUITE FILE_PATH="coverage/PythonQuiz$mainWithDb.coverage" NAME="mainWithDb Coverage Results" MODIFIED="1571565614380" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testquiz" />
   </component>
   <component name="editorHistoryManager">
@@ -518,13 +473,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sockets/reference.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="12" column="44" lean-forward="true" selection-start-line="12" selection-end-line="12" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Classes/Database.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-100">
@@ -539,40 +487,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Classes/Sockets.py">
+    <entry file="file://$PROJECT_DIR$/sockets/reference.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5325">
-          <caret line="306" lean-forward="true" selection-start-line="306" selection-end-line="306" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="200">
+          <caret line="8" column="62" lean-forward="true" selection-start-line="8" selection-start-column="62" selection-end-line="8" selection-end-column="62" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Classes/Question.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="382">
-          <caret line="95" column="34" lean-forward="true" selection-start-line="95" selection-start-column="34" selection-end-line="95" selection-end-column="34" />
+        <state relative-caret-position="386">
+          <caret line="83" column="18" lean-forward="true" selection-start-line="83" selection-start-column="18" selection-end-line="83" selection-end-column="18" />
           <folding>
             <element signature="e#17#28#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Classes/Sockets.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="308" lean-forward="true" selection-start-line="308" selection-end-line="308" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Classes/Screen.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="332">
-          <caret line="315" column="13" selection-start-line="315" selection-start-column="13" selection-end-line="315" selection-end-column="13" />
+        <state relative-caret-position="376">
+          <caret line="266" column="21" selection-start-line="266" selection-start-column="21" selection-end-line="266" selection-end-column="21" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
-            <element signature="e#311#1095#0" />
-            <element signature="e#1141#1928#0" />
-            <element signature="e#1987#3340#0" />
-            <element signature="e#3403#6199#0" />
-            <element signature="e#6264#7494#0" />
-            <element signature="e#7549#8578#0" />
-            <element signature="e#8661#10896#0" />
-            <element signature="e#14044#14961#0" />
+            <element signature="e#2044#3397#0" />
           </folding>
         </state>
       </provider>

@@ -35,6 +35,7 @@ class QuizApp(Tk):
 
         if args:
             self._frame = new_frame
+            print("Dit zijn onze args: "+str(args))
             #button4 = Button(self, text=args, fg='black', relief=FLAT, width=16).pack()
             server = args
             self._frame.pack()
@@ -53,7 +54,7 @@ class HomeScreen(Frame):
         button1 = Button(self, text='Create quiz', fg='black', relief=FLAT, width=16,
                             font=('arial', 20, 'bold'), command=lambda: master.switch_frame(CreateQuizScreen)).pack()
         button2 = Button(self, text='Host quiz', fg='black', relief=FLAT,
-                            width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizScreen)).pack()
+                            width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizScreen, 'a')).pack()
         button3 = Button(self, text='Play quiz', fg='black', relief=FLAT,
                             width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(JoinQuizScreen)).pack()
 
@@ -206,7 +207,11 @@ class TestServerScreen(Frame):
 
 # screen HOST QUIZ
 class HostQuizScreen(Frame):
-    def __init__(self, master):
+    def __init__(self, master, *args):
+        if args:
+            self.args = args
+            print("args in hostQuizScreen: " + str(self.args))
+
         Frame.__init__(self, master)
 
         def showQuizes():
@@ -266,7 +271,7 @@ class HostQuizWaitingScreen(Frame):
                         # don't update label
                         print('dont update')
                     else:
-                        outputLabel = Label(self, text=str(len(self.server.clients)), fg='black',font=('arial', 15, 'bold')).pack()
+                        outputLabel = Label(self, text=str(len(self.server.clients)), fg='black',font=('arial', 15, 'bold'))
                         amountOfPlayers = len(self.server.clients)
 
         def startServer():
@@ -313,8 +318,8 @@ class HostQuizStartScreen(Frame):
 
             self.server.setQuestionList(quiz)
 
-            #self.server.handleNextQuestion()
-            #self.server.waitAndSendScores()
+            self.server.handleNextQuestion()
+            self.server.waitAndSendScores()
 
             # self.server.setQuestionList([  # list of (for now hard-coded) questions that the clients will answer
             #     {
