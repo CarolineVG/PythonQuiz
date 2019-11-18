@@ -4,7 +4,7 @@
     <list default="true" id="d1e4dddb-1ee3-4bee-8a56-692bb7e96a81" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Classes/Screen.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Screen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Quiz.db" beforeDir="false" afterPath="$PROJECT_DIR$/Quiz.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testquiz/gradient.py" beforeDir="false" afterPath="$PROJECT_DIR$/testquiz/gradient.py" afterDir="false" />
     </list>
     <ignored path=".idea/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -32,11 +32,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Classes/Screen.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="376">
-              <caret line="266" column="21" selection-start-line="266" selection-start-column="21" selection-end-line="266" selection-end-column="21" />
+            <state relative-caret-position="500">
+              <caret line="48" lean-forward="true" selection-start-line="48" selection-end-line="48" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
-                <element signature="e#2044#3397#0" />
+                <element signature="e#394#1267#0" />
+                <element signature="e#1313#2316#0" />
               </folding>
             </state>
           </provider>
@@ -85,15 +86,16 @@
         <option value="$PROJECT_DIR$/Classes/Quiz.py" />
         <option value="$PROJECT_DIR$/Classes/Database.py" />
         <option value="$PROJECT_DIR$/Classes/Question.py" />
+        <option value="$PROJECT_DIR$/testquiz/gradient.py" />
         <option value="$PROJECT_DIR$/Classes/Screen.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="836" />
-    <option name="y" value="258" />
-    <option name="width" value="974" />
-    <option name="height" value="1047" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -111,16 +113,6 @@
               <item name="PythonQuiz" type="b2602c69:ProjectViewProjectNode" />
               <item name="PythonQuiz" type="462c0819:PsiDirectoryNode" />
               <item name="Classes" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PythonQuiz" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PythonQuiz" type="462c0819:PsiDirectoryNode" />
-              <item name="sockets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PythonQuiz" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PythonQuiz" type="462c0819:PsiDirectoryNode" />
-              <item name="testquiz" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -177,7 +169,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="client" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="gradient" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="PythonQuiz" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -185,12 +177,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sockets" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/testquiz" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sockets/client.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/testquiz/gradient.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -268,10 +260,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.home" />
+        <item itemvalue="Python.gradient" />
         <item itemvalue="Python.Sockets" />
         <item itemvalue="Python.server" />
         <item itemvalue="Python.mainWithDbAndClasses" />
-        <item itemvalue="Python.client" />
       </list>
     </recent_temporary>
   </component>
@@ -309,6 +301,8 @@
       <workItem from="1573735626923" duration="886000" />
       <workItem from="1573740866654" duration="2307000" />
       <workItem from="1574002062859" duration="40000" />
+      <workItem from="1574009708015" duration="4165000" />
+      <workItem from="1574080108832" duration="2403000" />
     </task>
     <task id="LOCAL-00001" summary="Add basic home and quiz screen">
       <created>1570805045185</created>
@@ -321,7 +315,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="69503000" />
+    <option name="totallyTimeSpent" value="76071000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -336,12 +330,12 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.496208" visible="true" weight="0.14498934" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.496208" visible="true" weight="0.13326226" />
       <window_info id="Structure" order="1" sideWeight="0.503792" side_tool="true" weight="0.13859275" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.23943663" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.20151679" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -368,7 +362,8 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/PythonQuiz$server.coverage" NAME="server Coverage Results" MODIFIED="1573138166355" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/sockets" />
-    <SUITE FILE_PATH="coverage/PythonQuiz$home.coverage" NAME="home Coverage Results" MODIFIED="1573744482387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PythonQuiz$gradient.coverage" NAME="gradient Coverage Results" MODIFIED="1574082888504" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testquiz" />
+    <SUITE FILE_PATH="coverage/PythonQuiz$home.coverage" NAME="home Coverage Results" MODIFIED="1574083225567" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/PythonQuiz$main.coverage" NAME="main Coverage Results" MODIFIED="1571564186014" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testquiz" />
     <SUITE FILE_PATH="coverage/PythonQuiz$sockets.coverage" NAME="sockets Coverage Results" MODIFIED="1572947176514" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/sockets" />
     <SUITE FILE_PATH="coverage/PythonQuiz$client.coverage" NAME="client Coverage Results" MODIFIED="1572947844439" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/sockets" />
@@ -466,13 +461,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/home.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Classes/Database.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-100">
@@ -514,13 +502,38 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/tkinter/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="2486" column="16" lean-forward="true" selection-start-line="2486" selection-end-line="2487" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/home.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testquiz/gradient.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="364">
+          <caret line="18" column="48" selection-start-line="18" selection-start-column="48" selection-end-line="18" selection-end-column="48" />
+          <folding>
+            <element signature="e#532#1879#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Classes/Screen.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="376">
-          <caret line="266" column="21" selection-start-line="266" selection-start-column="21" selection-end-line="266" selection-end-column="21" />
+        <state relative-caret-position="500">
+          <caret line="48" lean-forward="true" selection-start-line="48" selection-end-line="48" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
-            <element signature="e#2044#3397#0" />
+            <element signature="e#394#1267#0" />
+            <element signature="e#1313#2316#0" />
           </folding>
         </state>
       </provider>

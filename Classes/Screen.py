@@ -7,7 +7,10 @@ from Classes.Quiz import Quiz
 from Classes.Question import Question
 from Classes.Sockets import Server
 
-# global server var
+
+from PIL import Image, ImageDraw, ImageTk
+
+# global server var AANPASSEN GEEN GLOBAL VARS GEBRUIKEN!!
 server = ''
 hostQuiz = 0
 createQuizId = 0
@@ -19,13 +22,14 @@ class QuizApp(Tk):
         Tk.__init__(self)
         self._frame = None
         self.switch_frame(HomeScreen)
-        self.geometry("600x500")
+        #self.geometry("600x500")
+        self.configure(bg='#FE715B')
 
         # check size of screen
-        # height = self.winfo_screenheight()
-        # width = self.winfo_screenwidth()
-        # pixels = str(width) + 'x' + str(height)
-        # self.geometry(pixels)
+        height = self.winfo_screenheight()
+        width = self.winfo_screenwidth()
+        pixels = str(width - 10) + 'x' + str(height)
+        self.geometry(pixels)
 
     def switch_frame(self, frame_class, *args):
 
@@ -49,14 +53,18 @@ class HomeScreen(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
 
-        label1 = Label(self, text='Home', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+        # bg color
+        self.configure(bg='#FE715B')
 
-        button1 = Button(self, text='Create quiz', fg='black', relief=FLAT, width=16,
-                            font=('arial', 20, 'bold'), command=lambda: master.switch_frame(CreateQuizScreen)).pack()
-        button2 = Button(self, text='Host quiz', fg='black', relief=FLAT,
-                            width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizScreen, 'a')).pack()
-        button3 = Button(self, text='Play quiz', fg='black', relief=FLAT,
-                            width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(JoinQuizScreen)).pack()
+
+        label1 = Label(self, text='Home', fg='#850001', bg='#FE715B', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=30)
+
+        button1 = Button(self, text='Create quiz', fg='black', bg='white', relief=FLAT, borderwidth=2, width=16,
+                            font=('arial', 20, 'bold'), command=lambda: master.switch_frame(CreateQuizScreen)).pack(side="top", fill="x", pady=20)
+        button2 = Button(self, text='Host quiz', fg='black', bg='white', relief=FLAT,
+                            width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizScreen, 'a')).pack(side="top", fill="x", pady=20)
+        button3 = Button(self, text='Play quiz', fg='black', bg='white', relief=FLAT,
+                            width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(JoinQuizScreen)).pack(side="top", fill="x", pady=20)
 
 
 # screen CREATE QUIZ
@@ -65,6 +73,7 @@ class CreateQuizScreen(Frame):
     def __init__(self, master):
         # create quiz
         Frame.__init__(self, master)
+
 
         def saveQuiz():
             q = quizValue.get()

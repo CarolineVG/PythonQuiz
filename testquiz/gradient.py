@@ -1,15 +1,24 @@
-# Author: Miguel Martinez Lopez
-from tkinter import Canvas
-from tkinter.constants import *
+from tkinter import Canvas, Tk, Label, Button
 from PIL import Image, ImageDraw, ImageTk
+from tkinter.constants import *
+
 
 class GradientFrame(Canvas):
 
-    def __init__(self, master, color1, color2, height):
+    def __init__(self, master):
         Canvas.__init__(self, master)
 
-        color1 = (255, 179, 107)
-        color2 = (255, 103, 91)
+        self.setBackgroundColor2()
+        #self.setBackgroundColor((255, 179, 107), (255, 103, 91), 800)
+
+
+        # image
+        img = ImageTk.PhotoImage(Image.open("../trophy.png"))
+        self.create_image(10, 10, anchor=NW, image=img)
+
+    def setBackgroundColor(self, color1, color2, height):
+        color1 = color1
+        color2 = color2
 
         # color 1:
         red, green, blue = color1
@@ -46,15 +55,19 @@ class GradientFrame(Canvas):
         self._gradient_photoimage = ImageTk.PhotoImage(image)
         self.create_image(0, 0, anchor=NW, image=self._gradient_photoimage)
 
+        #label1 = Label(self, text='Home', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+
+
+
+    def setBackgroundColor2(self):
+        self.configure(bg='#FE715B')
+
+
 
 if __name__ == "__main__":
-    try:
-        from Tkinter import Tk, Label
-    except ImportError:
-        from tkinter import Tk, Label
 
     root = Tk()
 
-    GradientFrame(root, (255, 179, 107), (255, 103, 91), 800).pack(fill=X)
+    GradientFrame(root).pack(fill=X)
 
     root.mainloop()
