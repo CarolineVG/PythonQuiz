@@ -38,7 +38,7 @@ class Server:
             clientsocket, address = s.accept()
             if self.access == False:
                 #send back message to client so the client will close connection (I can't figure out how to do it from here)
-                self.sendToClient(clientSocket, '{"type":"connection refused"}')
+                self.sendToClient(clientsocket, '{"type":"connection refused"}')
             else:
                 self.clients.add(clientsocket)
             print(f"{len(self.clients)} players have connected.")

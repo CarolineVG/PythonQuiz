@@ -362,7 +362,10 @@ class HostQuizWaitingScreen(BaseScreen):
             print('update interface')
             amountOfPlayers = len(self.server.clients)
             outputLabel = Label(self, text=str(len(self.server.clients)), fg='black',
-                                    font=('arial', 15, 'bold')).pack()
+                                    font=('arial', 15, 'bold'))
+            outputLabel.pack()
+            print('eerste test: ' + str(outputLabel))
+
             while True:
                 if self.stopThread:
                     print('in please stop')
@@ -376,14 +379,7 @@ class HostQuizWaitingScreen(BaseScreen):
                     break
                 else:
                     time.sleep(2)
-                    print(f'threading')
-                    if amountOfPlayers == len(self.server.clients):
-                        # don't update label
-                        print('dont update')
-                    else:
-                        outputLabel = Label(self, text=str(len(self.server.clients)), fg='black',
-                                                font=('arial', 15, 'bold'))
-                        amountOfPlayers = len(self.server.clients)
+                    outputLabel.config(text = str(len(self.server.clients)))
 
         def startServer():
             print("start server")
@@ -435,7 +431,18 @@ class HostQuizStartScreen(BaseScreen):
             self.server.setQuestionList(quiz)
 
             self.server.handleNextQuestion()
+
+            # waiting screen that informs player that all questions are being answered
+
             self.server.waitAndSendScores()
+
+
+            # show scoreboard to players
+            # to do new screen:
+
+
+
+
 
         # PROBLEM: new screen only shows AFTER players answer first question
         label1 = Label(self, text='Players are answering...', fg='black', font=('arial', 24, 'bold')).pack(
