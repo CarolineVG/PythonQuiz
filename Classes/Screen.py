@@ -68,6 +68,7 @@ class BaseScreen(Frame):
     # get args
     def getArguments(self, args):
         self.args = args
+        print(f'arguments: {self.args}')
 
     def createButton(self, text, type, method):
         if type == None:
@@ -100,8 +101,6 @@ class TestScreen(BaseScreen):
 
         if args:
             self.getArguments(*args)
-            print(f'arguments: {self.args}')
-
 
         # bg color
         self.configure(bg='#FE715B')
@@ -122,7 +121,6 @@ class HomeScreen(BaseScreen):
 
         if args:
             self.getArguments(*args)
-            print(f'arguments: {self.args}')
 
 
         # bg color
@@ -154,7 +152,6 @@ class CreateQuizScreen(BaseScreen):
 
         if args:
             self.getArguments(*args)
-            print(f'arguments: {self.args}')
 
 
         def saveQuiz():
@@ -199,7 +196,6 @@ class CreateQuestionScreen(BaseScreen):
 
         if args:
             self.getArguments(*args)
-            print(f'arguments: {self.args}')
 
         def test():
             # create new Quiz
@@ -281,35 +277,46 @@ class HostQuizScreen(BaseScreen):
 
         # extend from BaseScreen
         BaseScreen.__init__(self, master)
+        self.master = master
 
         if args:
             self.getArguments(*args)
-            print(f'arguments: {self.args}')
 
-        def showQuizes():
-            # show all quizes from database
-            print('show quizes from database')
+        label1 = Label(self, text='Host Quiz', fg='black', bg='#FE715B', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
 
-            q = Quiz()
-            quizes = q.getDataFromDatabase()
-            print(f'db: {quizes}')
+        label2 = Label(self, text='Enter your ip:', fg='black', bg='#FE715B', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
 
-            for item in quizes:
-                print(item)
-                # temporary hardcoded link to first quiz
-                # can't pass vars via classes, use global var hostQuiz?
-                button1 = Button(self, text=item[1], fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),
-                                 command=lambda: master.switch_frame(HostQuizWaitingScreen)).pack()
+        self.ip = ""
+        
+        input = Entry(self, textvar=self.ip).pack()
+        
+        label3 = Label(self, text='Choose which quiz to host:', fg='black', bg='#FE715B', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+
+        self.showQuizes()
+
+        button4 = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
 
 
-        label1 = Label(self, text='Host Quiz', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+    def showQuizes(self):
+        # show all quizes from database
+        print('show quizes from database')
 
-        showQuizes()
+        q = Quiz()
+        quizes = q.getDataFromDatabase()
+        print(f'db: {quizes}')
 
-        button4 = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),
-                         command=lambda: master.switch_frame(HomeScreen)).pack()
+        for item in quizes:
+            print(item)
+            # temporary hardcoded link to first quiz
+            # can't pass vars via classes, use global var hostQuiz?
+            button1 = Button(self, text=item[1], fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: self.next()).pack()
 
-
+    def next(self):
+        ip = str(self.ip)
+        server = Server(ip, 5000)
+        self.master.switch_frame(HostQuizWaitingScreen, server)
+        
+'''
 # screen TEST SERVER SCREEN
 class TestServerScreen(Frame):
     # constructor
@@ -337,7 +344,7 @@ class TestServerScreen(Frame):
         btnDatabase = Button(self, text='Insert databases', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=insertDataInDatabase).pack()
         btnStartServer = Button(self, text='Start server', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizScreen)).pack()
         btnStartQuiz = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
-
+'''
 
 # screen WAITING QUIZ (temporary quiz1)
 class HostQuizWaitingScreen(BaseScreen):
@@ -346,63 +353,54 @@ class HostQuizWaitingScreen(BaseScreen):
 
         # extend from BaseScreen
         BaseScreen.__init__(self, master)
+        self.master = master
 
         if args:
             self.getArguments(*args)
-            print(f'arguments: {self.args}')
 
         # var server
-        self.server = Server("", 5000)
-        self.stopThread = False
+        self.server = self.args[0]
+        self.start = False
 
-        global server
-        server = self.server
+        label1 = Label(self, text='Host Quiz', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+        self.startServer()
 
-        def updateInterface():
-            print('update interface')
-            amountOfPlayers = len(self.server.clients)
-            outputLabel = Label(self, text=str(len(self.server.clients)), fg='black',
-                                    font=('arial', 15, 'bold'))
-            outputLabel.pack()
-            print('eerste test: ' + str(outputLabel))
+        label2 = Label(self, text='Waiting for players...', fg='black', font=('arial', 12, 'bold')).pack(side="top", fill="x", pady=5)
 
-            while True:
-                if self.stopThread:
-                    print('in please stop')
-                    self.server.stopHosting()
-                    server = self.server
-                    # temporary hardcoded
-                    # start quiz
-                    button4 = Button(self, text='Start Quiz', fg='black', relief=FLAT, width=16,
-                                         font=('arial', 20, 'bold'),
-                                         command=lambda: master.switch_frame(HostQuizStartScreen)).pack()
-                    break
-                else:
-                    time.sleep(2)
-                    outputLabel.config(text = str(len(self.server.clients)))
+        self.playersLabel = Label(self, text=f"{str(len(self.server.clients))} players are connected", fg='black',font=('arial', 15, 'bold'))
+        self.playersLabel.pack()
 
-        def startServer():
-            print("start server")
-            self.server.host()
+        self.continueButton = Button(self, text='Enough players', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: self.stopThread())
+        self.continueButton.pack()
+        
+        button2 = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
 
-        def stopThread():
-            # stop thread:
-            print("stop thread")
-            self.stopThread = True
+        #IMPORTANT: when we return, we probably have to shut down the server instance so it can be started again on the previous screen
+        #I don't know how to do this
+        #halp
 
-        label1 = Label(self, text='Host Quiz', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x",
-                                                                                                pady=5)
+        x = threading.Thread(target=self.updateInterface).start()
 
-        startServer()
+    def updateInterface(self):
+        amountOfPlayers = len(self.server.clients)
+        
+        while True:
+            if self.start:
+                self.server.stopHosting()
+                server = self.server
+                self.continueButton.config(text='Start Quiz', command=lambda: self.master.switch_frame(HostQuizStartScreen, self.server))
+                break
+            else:
+                self.playersLabel.config(text = f"{str(len(self.server.clients))} players are connected")
 
-        button4 = Button(self, text='Stop thread', fg='black', relief=FLAT,
-                             width=16, font=('arial', 20, 'bold'), command=stopThread).pack()
+    def startServer(self):
+        print("start server")
+        self.server.host()
 
-        button4 = Button(self, text='Return', fg='black', relief=FLAT,
-                             width=16, font=('arial', 20, 'bold'),
-                             command=lambda: master.switch_frame(HomeScreen)).pack()
-
-        x = threading.Thread(target=updateInterface).start()
+    def stopThread(self):
+        # stop thread:
+        print("stop thread")
+        self.start = True
 
 
 class HostQuizStartScreen(BaseScreen):
@@ -414,7 +412,6 @@ class HostQuizStartScreen(BaseScreen):
 
         if args:
             self.getArguments(*args)
-            print(f'arguments: {self.args}')
 
         # get server object from global server
         self.server = server
@@ -461,7 +458,6 @@ class JoinQuizScreen(BaseScreen):
 
         if args:
             self.getArguments(*args)
-            print(f'arguments: {self.args}')
 
         # input vars
         pinValue = StringVar()
