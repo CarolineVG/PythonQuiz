@@ -7,8 +7,6 @@ from Classes.Sockets import Server
 
 
 # global server var AANPASSEN GEEN GLOBAL VARS GEBRUIKEN!!
-server = ''
-hostQuiz = 0
 createQuizId = 0
 
 # class QuizApp
@@ -240,13 +238,11 @@ class CreateQuizScreen(BaseScreen):
         # get id from new quiz
         result = newQuiz.getIdFromQuizName(q)
 
-        # to do: change global
-        global createQuizId
         createQuizId = result[0]
         print(createQuizId)
 
         # add questions button
-        self.createButton('Add Questions', 'confirm', lambda: self.master.switch_frame(CreateQuestionScreen)).pack(
+        self.createButton('Add Questions', 'confirm', lambda: self.master.switch_frame(CreateQuestionScreen, createQuizId)).pack(
             side="top", fill="x", pady=10)
 
         # disable save button and return button (you can't make an empty quiz)
@@ -263,6 +259,10 @@ class CreateQuestionScreen(BaseScreen):
 
         if args:
             self.getArguments(*args)
+
+        arg = args[0]
+        self.quizId = arg[0]
+        print(self.quizId)
 
 
         self.questionValue = StringVar()
@@ -305,7 +305,7 @@ class CreateQuestionScreen(BaseScreen):
 
     def addQuestion(self):
         # create new Quiz
-        print(f'Quiz Id: {createQuizId}')
+        print(f'Quiz Id: {self.quizId}')
 
         q = self.questionValue.get()
         a1 = self.answer1Value.get()
@@ -316,7 +316,7 @@ class CreateQuestionScreen(BaseScreen):
 
         # create new Question: temp: 2 = solution
         newQuestion = Question()
-        newQuestion.addQuestion(createQuizId, q, s, a1, a2, a3, a4, 60, 10)
+        newQuestion.addQuestion(self.quizId, q, s, a1, a2, a3, a4, 60, 10)
         newQuestion.addQuestionToDatabase()
         newQuestion.getQuestionFromDatabase()
 
@@ -341,13 +341,13 @@ class HostQuizScreen(BaseScreen):
         
         self.createLabel('Host Quiz', 'title').pack(side="top", fill="x", pady=30)
 
-        self.createLabel('Enter your ip:', 'default').pack(side="top", fill="x", pady=5)
+        self.createLabel('Enter your IP:', 'default').pack(side="top", fill="x", pady=5)
 
         self.ip = ""
         
         input = Entry(self, textvar=self.ip).pack()
 
-        self.createLabel('Whoose which quiz to host:', 'default').pack(side="top", fill="x", pady=5)
+        self.createLabel('Choose which quiz to host:', 'default').pack(side="top", fill="x", pady=5)
 
         self.showQuizes()
 
