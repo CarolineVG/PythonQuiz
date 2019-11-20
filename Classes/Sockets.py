@@ -130,8 +130,15 @@ class Server:
         return self.scores
 
     def getSortedScores(self):
-        return sortScores(self.scores)
+        return self.sortScores(self.scores)
 
+    def wait(self):
+        if self.ready == False:
+            print("waiting...")
+        while True:
+            if self.ready:
+                return True
+            
     def waitAndGetScores(self):
         if self.ready == False:
             print("waiting for the scores...")

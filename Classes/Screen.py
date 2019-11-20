@@ -425,14 +425,21 @@ class HostQuizStartScreen(BaseScreen):
         
         #at what question are we? If no position is specified, this is the first question.
         if len(self.args) > 1 and self.args[1] == 0:
-            print("hier")
             position = self.args[1]
-            print(position)
             button = Button(self, text='Send the first question!', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),command=lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position))
             button.pack()
         else:
-            print("daar")
             position = self.args[1]
+            # send scores to clients
+            self.server.sendScores()
+            # show scoreboard
+            scores = self.server.getSortedScores()
+
+            label1 = Label(self, text='Scoreboard:', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+
+            for player in scores:
+                label2 = Label(self, text=str(player[1])+" - "+str(player[0]), fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+            
             button = Button(self, text='Send the next question!', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position)).pack()
 
         
@@ -479,11 +486,21 @@ class HostQuizQuestionScreen(BaseScreen):
         
         self.position = self.args[1]
 
-        self.server.handleNextQuestion()
-        label1 = Label(self, text='Players are answering...', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+        label1 = Label(self, text='current question:', fg='black', font=('arial', 14, 'bold')).pack(side="top", fill="x", pady=5)
 
-        self.server.waitAndSendScores()
-        # show scoreboard
+        label2 = Label(self, text=self.server.questionList[self.position]["question"], fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+
+        for item in self.server.questionList[self.position]["options"]:
+            option = Label(self, text=self.server.questionList[self.position]["options"][item], fg='black', font=('arial', 14, 'bold')).pack(side="top", fill="x", pady=5)
+        
+        self.server.handleNextQuestion()
+        label3 = Label(self, text='Players are answering...', fg='black', font=('arial', 24, 'bold'))
+        label3.pack(side="top", fill="x", pady=5)
+
+        if self.server.wait():
+            label3.destroy()
+            button = Button(self, text='View scores', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),command=lambda: master.switch_frame(HostQuizStartScreen, self.server, self.position+1))
+            button.pack()
 
 # screen JOIN QUIZ
 class JoinQuizScreen(BaseScreen):
