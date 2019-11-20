@@ -35,6 +35,7 @@ class QuizApp(Tk):
         # frame_class = any class that has been given as a parameter
         # assign self from QuizApp to frame_class
         if args:
+            print("args === "+str(args))
             new_frame = frame_class(self, args)
         else:
             new_frame = frame_class(self)
@@ -306,14 +307,20 @@ class HostQuizScreen(BaseScreen):
         print(f'db: {quizes}')
 
         for item in quizes:
-            print(item)
-            # temporary hardcoded link to first quiz
-            # can't pass vars via classes, use global var hostQuiz?
-            button1 = Button(self, text=item[1], fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: self.next()).pack()
+            print("Item in quizes = "+str(item))
+            quizId = item[0]
+            button1 = Button(self, text=item[1], fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda quizId=quizId: self.next(quizId)).pack()
 
-    def next(self):
+    def next(self, quizId):
         ip = str(self.ip)
         server = Server(ip, 5000)
+
+        print("this should be our quiz id -> "+str(quizId))
+        q = Question()
+        questions = q.createQuizWithQuestions(quizId)
+        print("this should be a question list -> "+str(questions))
+        
+        server.setQuestionList(questions)
         self.master.switch_frame(HostQuizWaitingScreen, server)
         
 '''
@@ -365,8 +372,9 @@ class HostQuizWaitingScreen(BaseScreen):
         label1 = Label(self, text='Host Quiz', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
         self.startServer()
 
-        label2 = Label(self, text='Waiting for players...', fg='black', font=('arial', 12, 'bold')).pack(side="top", fill="x", pady=5)
-
+        self.waitingLabel = Label(self, text='Waiting for players...', fg='black', font=('arial', 12, 'bold'))
+        self.waitingLabel.pack(side="top", fill="x", pady=5)
+        
         self.playersLabel = Label(self, text=f"{str(len(self.server.clients))} players are connected", fg='black',font=('arial', 15, 'bold'))
         self.playersLabel.pack()
 
@@ -388,11 +396,11 @@ class HostQuizWaitingScreen(BaseScreen):
             if self.start:
                 self.server.stopHosting()
                 server = self.server
-                self.continueButton.config(text='Start Quiz', command=lambda: self.master.switch_frame(HostQuizStartScreen, self.server))
+                self.continueButton.config(text='Start Quiz', command=lambda: self.master.switch_frame(HostQuizStartScreen, self.server, 0))
+                self.waitingLabel.config(text = "Ready to begin")
                 break
             else:
                 self.playersLabel.config(text = f"{str(len(self.server.clients))} players are connected")
-
     def startServer(self):
         print("start server")
         self.server.host()
@@ -413,40 +421,69 @@ class HostQuizStartScreen(BaseScreen):
         if args:
             self.getArguments(*args)
 
-        # get server object from global server
-        self.server = server
-        print(f'server start screen: {self.server}')
+        self.server = self.args[0]
+        
+        #at what question are we? If no position is specified, this is the first question.
+        if len(self.args) > 1 and self.args[1] == 0:
+            print("hier")
+            position = self.args[1]
+            print(position)
+            button = Button(self, text='Send the first question!', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),command=lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position))
+            button.pack()
+        else:
+            print("daar")
+            position = self.args[1]
+            button = Button(self, text='Send the next question!', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position)).pack()
 
-        # server object from hostquiz waiting screen
+        
 
-        def sendFirstQuestion():
-            # import from db with correct quizId
-            quizId = 1
-            newQuestion = Question()
-            quiz = newQuestion.createQuizWithQuestions(quizId)
+    '''
+    def sendFirstQuestion():
+        # import from db with correct quizId
+        quizId = 1
+        newQuestion = Question()
+        quiz = newQuestion.createQuizWithQuestions(quizId)
 
-            self.server.setQuestionList(quiz)
+        self.server.setQuestionList(quiz)
 
-            self.server.handleNextQuestion()
+        self.server.handleNextQuestion()
 
-            # waiting screen that informs player that all questions are being answered
+        # waiting screen that informs player that all questions are being answered
 
-            self.server.waitAndSendScores()
-
-
-            # show scoreboard to players
-            # to do new screen:
+        self.server.waitAndSendScores()
 
 
-
-
+        # show scoreboard to players
+        # to do new screen:
 
         # PROBLEM: new screen only shows AFTER players answer first question
         label1 = Label(self, text='Players are answering...', fg='black', font=('arial', 24, 'bold')).pack(
                 side="top", fill="x", pady=5)
 
         sendFirstQuestion()
+    '''
 
+class HostQuizQuestionScreen(BaseScreen):
+    # master = self from QuizApp
+    def __init__(self, master, *args):
+
+        print("in HostQuizQuestionScreen constructor")
+
+        # extend from BaseScreen
+        BaseScreen.__init__(self, master)
+
+        if args:
+            self.getArguments(*args)
+
+        self.server = self.args[0]
+        
+        self.position = self.args[1]
+
+        self.server.handleNextQuestion()
+        label1 = Label(self, text='Players are answering...', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+
+        self.server.waitAndSendScores()
+        # show scoreboard
 
 # screen JOIN QUIZ
 class JoinQuizScreen(BaseScreen):
