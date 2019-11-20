@@ -407,7 +407,7 @@ class HostQuizWaitingScreen(BaseScreen):
         self.playersLabel = self.createLabel('f"{str(len(self.server.clients))} players are connected"', 'default')
         self.playersLabel.pack()
 
-        self.continueButton = self.createButton('Enough players', 'confirm', lambda: self.stopThread())
+        self.continueButton = self.createButton('Enough players', 'default', lambda: self.stopThread())
         self.continueButton.pack()
         
         self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x",pady=20)
@@ -425,7 +425,7 @@ class HostQuizWaitingScreen(BaseScreen):
             if self.start:
                 self.server.stopHosting()
                 server = self.server
-                self.continueButton.config(text='Start Quiz', command=lambda: self.master.switch_frame(HostQuizStartScreen, self.server, 0))
+                self.continueButton.config(text='Start Quiz', command=lambda: self.master.switch_frame(HostQuizScoreScreen, self.server, 0))
                 self.waitingLabel.config(text = "Ready to begin")
                 break
             else:
@@ -451,7 +451,7 @@ class HostQuizWaitingScreen(BaseScreen):
 
 
 # screen HOST QUIZ START
-class HostQuizStartScreen(BaseScreen):
+class HostQuizScoreScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
 
@@ -469,8 +469,7 @@ class HostQuizStartScreen(BaseScreen):
         if self.args[1] == 0:
             # If position is 0 this is the first question.
             position = self.args[1]
-            button = Button(self, text='Send the first question!', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),command=lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position))
-            button.pack()
+            self.createButton('Send the first question!', 'default', lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position)).pack()
         else:
             position = self.args[1]
             # send scores to clients
@@ -478,24 +477,23 @@ class HostQuizStartScreen(BaseScreen):
             # show scoreboard
             scores = self.server.getSortedScores()
 
-            title = Label(self, text='Scoreboard:', fg='black', font=('arial', 24, 'bold'))
-            title.pack(side="top", fill="x", pady=5)
+            title = self.createLabel('Scoreboard:', 'title')
+            title.pack(side="top", fill="x", pady=30)
 
             for player in scores:
-                label2 = Label(self, text=str(player[0])+" - "+str(player[1]), fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+                self.createLabel(str(player[0])+" - "+str(player[1]), 'default').pack(side="top", fill="x", pady=5)
 
             if self.args[1] == len(self.server.questionList):
                 title.config(text="Final scores:")
 
-                label1 = Label(self, text=f"The winner is {scores[0][0]}!", fg='black', font=('arial', 18, 'bold')).pack(side="top", fill="x", pady=5)
+                self.createLabel(f"The winner is {scores[0][0]}!", 'default').pack(side="top", fill="x", pady=5)
                 if len(scores) > 1:
-                    label1 = Label(self, text=f"{scores[1][0]} came in second.", fg='black', font=('arial', 14, 'bold')).pack(side="top", fill="x", pady=5)
+                    self.createLabel(f"{scores[1][0]} came in second.", 'default').pack(side="top", fill="x", pady=5)
                 if len(scores) > 2:
-                    label1 = Label(self, text=f"{scores[3][0]} came in third.", fg='black', font=('arial', 12, 'bold')).pack(side="top", fill="x", pady=5)
-
-                button = Button(self, text='End quiz', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: self.endQuiz()).pack()
+                    self.createLabel(f"{scores[3][0]} came in third.", 'default').pack(side="top", fill="x", pady=5)
+                self.createButton('End quiz', 'default', lambda: self.endQuiz()).pack()
             else:
-                button = Button(self, text='Send the next question!', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position)).pack()
+                self.createButton('Send the next question!', 'default', lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position)).pack()
 
     def endQuiz(self):
         self.server.endQuiz()
@@ -517,21 +515,24 @@ class HostQuizQuestionScreen(BaseScreen):
         
         self.position = self.args[1]
 
-        label1 = Label(self, text='current question:', fg='black', font=('arial', 14, 'bold')).pack(side="top", fill="x", pady=5)
+        #layout
+        self.configure(bg=self.setBackgroundColor())
 
-        label2 = Label(self, text=self.server.questionList[self.position]["question"], fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+        self.createLabel('current question:', 'default').pack(side="top", fill="x", pady=5)
+
+        self.createLabel(self.server.questionList[self.position]["question"], 'title').pack(side="top", fill="x", pady=5)
 
         for item in self.server.questionList[self.position]["options"]:
-            option = Label(self, text=self.server.questionList[self.position]["options"][item], fg='black', font=('arial', 14, 'bold')).pack(side="top", fill="x", pady=5)
-        
+            self.createLabel(self.server.questionList[self.position]["options"][item], 'default').pack(side="top", fill="x", pady=5)
+
         self.server.handleNextQuestion()
-        label3 = Label(self, text='Players are answering...', fg='black', font=('arial', 24, 'bold'))
+        
+        label3 = self.createLabel('Players are answering...', 'default')
         label3.pack(side="top", fill="x", pady=5)
 
         if self.server.wait():
             label3.destroy()
-            button = Button(self, text='View scores', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),command=lambda: master.switch_frame(HostQuizStartScreen, self.server, self.position+1))
-            button.pack()
+            self.createButton('View scores', 'confirm', lambda: master.switch_frame(HostQuizScoreScreen, self.server, self.position+1)).pack()
 
 # screen JOIN QUIZ NOT UPDATED LAYOUT
 class JoinQuizScreen(BaseScreen):
