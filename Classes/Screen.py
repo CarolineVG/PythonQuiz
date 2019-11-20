@@ -1,14 +1,10 @@
-import sqlite3
 import threading
 import time
 from tkinter import *
-from Classes.Database import Database
 from Classes.Quiz import Quiz
 from Classes.Question import Question
 from Classes.Sockets import Server
 
-
-from PIL import Image, ImageDraw, ImageTk
 
 # global server var AANPASSEN GEEN GLOBAL VARS GEBRUIKEN!!
 server = ''
@@ -21,7 +17,7 @@ class QuizApp(Tk):
         Tk.__init__(self)
         self._frame = None
         self.switch_frame(HomeScreen)
-        self.geometry("600x500")
+        self.geometry("600x800")
         self.configure(bg='#FE715B')
 
         # check size of screen
@@ -55,41 +51,114 @@ class BaseScreen(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
 
-        # layout vars
-        self.font='arial'
-        #self.buttonSize
-        # to do: colors, sizes
+        self.backgroundColor = "#FE715B"
 
+        # -- LABEL --
+        self.labelForeColor = "#850001"
+        self.labelBackColor = self.backgroundColor
+        self.fontFamily = 'arial'
+        self.LabelTitleFontSize = 30
+        self.labelFontSize = 18
+        self.labelFontType = ''
 
+        # -- BUTTON --
+        self.buttonForeColor = "#850001"
+        self.buttonBackColor = "#FFF"
+        self.buttonActiveForeColor = "#850001"
+        self.buttonActiveBackColor = "#FFFFF0"
+        self.buttonWidth = 18
+        self.buttonFontFamily = self.fontFamily
+        self.buttonFontSize = 18
+        self.buttonFontType = "bold"
 
-        #button1 = Button(self, text='Create quiz', fg='black', bg='white', relief=FLAT, borderwidth=2, width=16,
-        # font=('arial', 20, 'bold'), command=lambda: master.switch_frame(CreateQuizScreen)).
-        # pack(side="top", fill="x", pady=20)
+        # -- ENTRY --
+        self.entryForeColor = "#850001"
+        self.entryBackColor = "#FFF"
+        self.entryWidth = 18
+        self.entryFontFamily = self.fontFamily
+        self.entryFontSize = 18
+        self.entryFontType = ""
 
     # get args
     def getArguments(self, args):
         self.args = args
         print(f'arguments: {self.args}')
 
+    def setBackgroundColor(self):
+        return self.backgroundColor
+
     def createButton(self, text, type, method):
         if type == None:
             type = "default"
 
-        # type buttons
-        # default:
-        # return:
-        # confirm:
-
         # methods:
         # function or switch screen
+        newMethod = method
 
         # type (basic,...), method: , colors:
-        basicButton = Button(self, text=text, fg='black', bg='white', relief=FLAT, borderwidth=2,
-                                  width=16, font=('arial', 20, 'bold'))
 
-        return basicButton
+        # CONFIRM button: bg green
+        if type == "confirm":
+            newButtonForeColor = "#FFF"
+            newButtonBackColor = "green"
+            newButtonActiveForeColor = "#FFF"
+            newButtonActiveBackColor = "#7BC17E"
 
-    # create label function
+            button = Button(self, text=text, fg=newButtonForeColor, bg=newButtonBackColor,
+                          activeforeground=newButtonActiveForeColor, activebackground=newButtonActiveBackColor,
+                          relief=FLAT, width=self.buttonWidth, font=(self.buttonFontFamily, self.buttonFontSize, self.buttonFontType), command=method)
+
+
+        # RETURN button bg red
+        elif type == "return":
+            newButtonForeColor = "#FFF"
+            newButtonBackColor = "#92050C"
+            newButtonActiveForeColor = "#FFF"
+            newButtonActiveBackColor = "#92050C"
+
+            button = Button(self, text=text, fg=newButtonForeColor, bg=newButtonBackColor,
+                            activeforeground=newButtonActiveForeColor, activebackground=newButtonActiveBackColor,
+                            relief=FLAT, width=self.buttonWidth,
+                            font=(self.buttonFontFamily, self.buttonFontSize, self.buttonFontType), command=method)
+
+        # DEFAULT button
+        elif type == "default":
+            # default buttons, no vars to change
+            button = Button(self, text=text, fg=self.buttonForeColor, bg=self.buttonBackColor,
+                          activeforeground=self.buttonActiveForeColor, activebackground=self.buttonActiveBackColor,
+                          relief=FLAT,
+                          width=self.buttonWidth,
+                          font=(self.buttonFontFamily, self.buttonFontSize, self.buttonFontType), command=method)
+
+        return button
+
+    def createLabel(self, text, type):
+
+        if type == None:
+            type = "default"
+        # TITLE
+        if type == "title":
+            newLabelFontSize = 30
+            newLabelFontType = 'bold'
+
+            label = Label(self, text=text, fg=self.labelForeColor, bg=self.labelBackColor, font=(self.fontFamily, newLabelFontSize, newLabelFontType))
+        # DEFAULT
+        elif type == "default":
+            label = Label(self, text=text, fg=self.labelForeColor, bg=self.labelBackColor,
+                          font=(self.fontFamily, self.labelFontSize, self.labelFontType))
+
+        return label
+
+    def createInput(self, value, type):
+
+        if type == None:
+            type = "default"
+
+        # DEFAULT
+        if type == "default":
+            inputfield = Entry(self, textvar=value, fg = self.entryForeColor, bg = self.entryBackColor, width = self.entryWidth, font = (self.entryFontFamily, self.entryFontSize, self.entryFontType))
+
+        return inputfield
 
 
 # TEST screen
@@ -106,13 +175,15 @@ class TestScreen(BaseScreen):
         # bg color
         self.configure(bg='#FE715B')
 
-        self.createButton('a', 'b', 'c').pack()
+        self.createButton('confirm', 'confirm', 'c').pack()
+        self.createButton('return', 'return', 'c').pack()
+        self.createButton('default', 'default', 'c').pack()
 
 
         label1 = Label(self, text=self.args, fg='#850001', bg='#FE715B', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=30)
 
 
-# home
+# screen HOME
 class HomeScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
@@ -123,24 +194,15 @@ class HomeScreen(BaseScreen):
         if args:
             self.getArguments(*args)
 
+        # layout
+        self.configure(bg=self.setBackgroundColor())
 
-        # bg color
-        self.configure(bg='#FE715B')
+        self.createLabel('Home', 'title').pack(side="top",fill="x",pady=30)
 
-        label1 = Label(self, text='Home', fg='#850001', bg='#FE715B', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=30)
-
-        button1 = Button(self, text='Create quiz', fg='black', bg='white', relief=FLAT, borderwidth=2, width=16,
-                            font=('arial', 20, 'bold'), command=lambda: master.switch_frame(CreateQuizScreen)).pack(side="top", fill="x", pady=20)
-        button2 = Button(self, text='Host quiz', fg='black', bg='white', relief=FLAT,
-                            width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizScreen, 'a')).pack(side="top", fill="x", pady=20)
-        button3 = Button(self, text='Play quiz', fg='black', bg='white', relief=FLAT,
-                            width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(JoinQuizScreen)).pack(side="top", fill="x", pady=20)
-
-
-
-        button4 = Button(self, text='Test', fg='black', bg='white', relief=FLAT,
-                                 width=16, font=('arial', 20, 'bold'),
-                                 command=lambda: master.switch_frame(TestScreen, 1, 2)).pack(side="top", fill="x", pady=20)
+        self.createButton('Create Quiz', 'default', lambda: master.switch_frame(CreateQuizScreen)).pack(side="top", fill="x", pady=20)
+        self.createButton('Host Quiz', 'default', lambda: master.switch_frame(HostQuizScreen, 'a')).pack(side="top",fill="x",pady=20)
+        self.createButton('Play Quiz', 'default', lambda: master.switch_frame(JoinQuizScreen)).pack(side="top",fill="x",pady=20)
+        self.createButton('TEST', 'return', lambda: master.switch_frame(TestScreen, 1, 2)).pack(side="top",fill="x",pady=20)
 
 
 # screen CREATE QUIZ
@@ -154,37 +216,41 @@ class CreateQuizScreen(BaseScreen):
         if args:
             self.getArguments(*args)
 
+        self.quizValue = StringVar()
 
-        def saveQuiz():
-            q = quizValue.get()
-            print(f'new quiz: {q}')
+        # layout
+        self.configure(bg=self.setBackgroundColor())
 
-            # create new Quiz
-            newQuiz = Quiz()
-            newQuiz.setQuizName(q)
-            newQuiz.addQuizToDatabase()
+        self.createLabel('Quiz', 'title').pack(side="top", fill="x", pady=30)
 
-            # get id from new quiz
-            result = newQuiz.getIdFromQuizName(q)
-            global createQuizId
-            createQuizId = result[0]
-            print(createQuizId)
+        self.createLabel('Quiz Name*', 'default').pack(side="top", fill="x", pady=30)
+        self.createInput(self.quizValue, 'default').pack()
 
-            # change layout
-            button2 = Button(self, text='Add questions', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),
-                             command=lambda: master.switch_frame(CreateQuestionScreen)).pack()
+        self.createButton('Save', 'confirm', self.saveQuiz).pack(side="top",fill="x",pady=10)
+        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top",fill="x",pady=10)
 
-        quizValue = StringVar()
+    def saveQuiz(self):
+        q = self.quizValue.get()
 
-        pinLabel = Label(self, text='Quiz', fg='black', font=('arial', 24, 'bold')).pack()
+        # create new Quiz
+        newQuiz = Quiz()
+        newQuiz.setQuizName(q)
+        newQuiz.addQuizToDatabase()
 
-        questionLabel = Label(self, text='Quiz Name*', fg='black', font=('arial', 16, 'bold')).pack()
+        # get id from new quiz
+        result = newQuiz.getIdFromQuizName(q)
 
-        questionInput = Entry(self, textvar=quizValue).pack()
+        # to do: change global
+        global createQuizId
+        createQuizId = result[0]
+        print(createQuizId)
 
-        button1 = Button(self, text='Save', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=saveQuiz).pack()
+        # add questions button
+        self.createButton('Add Questions', 'confirm', lambda: self.master.switch_frame(CreateQuestionScreen)).pack(
+            side="top", fill="x", pady=10)
 
-        button3 = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
+        # disable save button and return button (you can't make an empty quiz)
+        # to do ...
 
 
 # screen CREATE QUESTION QUIZ
@@ -198,77 +264,64 @@ class CreateQuestionScreen(BaseScreen):
         if args:
             self.getArguments(*args)
 
-        def test():
-            # create new Quiz
-            print(f'Quiz Id: {createQuizId}')
 
-            q = questionValue.get()
-            a1 = answer1Value.get()
-            a2 = answer2Value.get()
-            a3 = answer3Value.get()
-            a4 = answer4Value.get()
-            s = solutionValue.get()
+        self.questionValue = StringVar()
+        self.answer1Value = StringVar()
+        self.answer2Value = StringVar()
+        self.answer3Value = StringVar()
+        self.answer4Value = StringVar()
+        self.solutionValue = StringVar()
 
-            # create new Question: temp: 2 = solution
-            newQuestion = Question()
-            newQuestion.addQuestion(createQuizId, q, s, a1, a2, a3, a4, 60, 10)
-            newQuestion.addQuestionToDatabase()
-            newQuestion.getQuestionFromDatabase()
+        # layout
+        self.configure(bg=self.setBackgroundColor())
 
-            # to do: change hardcoded question to input from user
+        self.createLabel('Quiz', 'title').pack(side="top", fill="x", pady=30)
 
-            # test: from database to json format to send to server
-            # newQuestion.sendQuestionToServer()
-            #
-            # s = Server("", 5000)
-            # s.host()
+        self.createLabel('Question', 'default').pack()
+        self.createInput(self.questionValue, 'default').pack()
 
-            # server.addQuestion(question)
+        self.createLabel('Answer 1', 'default').pack()
+        self.createInput(self.answer1Value, 'default').pack()
 
-            # question = '{"type":"question", "sender": "Host", "id":"' + question['id'] + '", "question": "' + question[
-            #     'question'] + '", "options":' + json.dumps(question['options']) + ',"time":' + json.dumps(
-            #     question['time']) + '}'
+        self.createLabel('Answer 2', 'default').pack()
+        self.createInput(self.answer2Value, 'default').pack()
 
-            # empty everything for new question
-            # TO DO...
+        self.createLabel('Answer 3', 'default').pack()
+        self.createInput(self.answer3Value, 'default').pack()
 
-        questionValue = StringVar()
-        answer1Value = StringVar()
-        answer2Value = StringVar()
-        answer3Value = StringVar()
-        answer4Value = StringVar()
-        solutionValue = StringVar()
+        self.createLabel('Answer 4', 'default').pack()
+        self.createInput(self.answer4Value, 'default').pack()
 
-        pinLabel = Label(self, text='Quiz', fg='black', font=('arial', 24, 'bold')).pack()
-
-        questionLabel = Label(self, text='Question*', fg='black', font=('arial', 16, 'bold')).pack()
-        questionInput = Entry(self, textvar=questionValue).pack()
-
-        answer1Label = Label(self, text='Answer 1*', fg='black', font=('arial', 16, 'bold')).pack()
-        answer1Input = Entry(self, textvar=answer1Value).pack()
-
-        answer2Label = Label(self, text='Answer 2*', fg='black', font=('arial', 16, 'bold')).pack()
-        answer2Input = Entry(self, textvar=answer2Value).pack()
-
-        answer3Label = Label(self, text='Answer 3', fg='black', font=('arial', 16, 'bold')).pack()
-        answer3Input = Entry(self, textvar=answer3Value).pack()
-
-        answer4Label = Label(self, text='Answer 4', fg='black', font=('arial', 16, 'bold')).pack()
-        answer4Input = Entry(self, textvar=answer4Value).pack()
-
+        # TO DO: LAYOUT
         solutionLabel = Label(self, text='Correct answer', fg='black', font=('arial', 16, 'bold')).pack()
-        r1 = Radiobutton(self, text='1', variable=solutionValue, value='option1').pack()
-        r2 = Radiobutton(self, text='2', variable=solutionValue, value='option2').pack()
-        r3 = Radiobutton(self, text='3', variable=solutionValue, value='option3').pack()
-        r4 = Radiobutton(self, text='4', variable=solutionValue, value='option4').pack()
+        r1 = Radiobutton(self, text='1', variable=self.solutionValue, value='option1').pack()
+        r2 = Radiobutton(self, text='2', variable=self.solutionValue, value='option2').pack()
+        r3 = Radiobutton(self, text='3', variable=self.solutionValue, value='option3').pack()
+        r4 = Radiobutton(self, text='4', variable=self.solutionValue, value='option4').pack()
 
-        button1 = Button(self, text='Save and next question', fg='black', relief=FLAT, width=16,
-                         font=('arial', 20, 'bold'), command=test).pack()
-        button2 = Button(self, text='Finish quiz', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),
-                         command=lambda: master.switch_frame(HostQuizScreen)).pack()
+        self.createButton('Save and next question', 'confirm', lambda: self.addQuestion()).pack(side="top", fill="x",pady=20)
+        self.createButton('Finish Quiz', 'confirm', lambda: master.switch_frame(HostQuizScreen)).pack(side="top", fill="x",pady=20)
+        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x",pady=20)
 
-        button3 = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),
-                         command=lambda: master.switch_frame(HomeScreen)).pack()
+    def addQuestion(self):
+        # create new Quiz
+        print(f'Quiz Id: {createQuizId}')
+
+        q = self.questionValue.get()
+        a1 = self.answer1Value.get()
+        a2 = self.answer2Value.get()
+        a3 = self.answer3Value.get()
+        a4 = self.answer4Value.get()
+        s = self.solutionValue.get()
+
+        # create new Question: temp: 2 = solution
+        newQuestion = Question()
+        newQuestion.addQuestion(createQuizId, q, s, a1, a2, a3, a4, 60, 10)
+        newQuestion.addQuestionToDatabase()
+        newQuestion.getQuestionFromDatabase()
+
+        # empty everything for new question
+        # TO DO...
 
 
 # screen HOST QUIZ
@@ -283,20 +336,22 @@ class HostQuizScreen(BaseScreen):
         if args:
             self.getArguments(*args)
 
-        label1 = Label(self, text='Host Quiz', fg='black', bg='#FE715B', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+        #layout
+        self.configure(bg=self.setBackgroundColor())
+        
+        self.createLabel('Host Quiz', 'title').pack(side="top", fill="x", pady=30)
 
-        label2 = Label(self, text='Enter your ip:', fg='black', bg='#FE715B', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+        self.createLabel('Enter your ip:', 'default').pack(side="top", fill="x", pady=5)
 
         self.ip = ""
         
         input = Entry(self, textvar=self.ip).pack()
-        
-        label3 = Label(self, text='Choose which quiz to host:', fg='black', bg='#FE715B', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+
+        self.createLabel('Whoose which quiz to host:', 'default').pack(side="top", fill="x", pady=5)
 
         self.showQuizes()
 
-        button4 = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
-
+        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x",pady=20)
 
     def showQuizes(self):
         # show all quizes from database
@@ -307,9 +362,8 @@ class HostQuizScreen(BaseScreen):
         print(f'db: {quizes}')
 
         for item in quizes:
-            print("Item in quizes = "+str(item))
             quizId = item[0]
-            button1 = Button(self, text=item[1], fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda quizId=quizId: self.next(quizId)).pack()
+            self.createButton(item[1], 'default', lambda quizId=quizId: self.next(quizId)).pack(side="top",fill="x", pady=20)
 
     def next(self, quizId):
         ip = str(self.ip)
@@ -322,36 +376,7 @@ class HostQuizScreen(BaseScreen):
         
         server.setQuestionList(questions)
         self.master.switch_frame(HostQuizWaitingScreen, server)
-        
-'''
-# screen TEST SERVER SCREEN
-class TestServerScreen(Frame):
-    # constructor
-    def __init__(self, master):
-        # create quiz
-        Frame.__init__(self, master)
 
-        def insertDataInDatabase():
-            # test Quiz Class
-            # create new Quiz
-            newQuiz = Quiz(1, 'test')
-            newQuiz.addQuizToDatabase()
-            newQuiz.getDataFromDatabase()
-
-            # create new Question
-            newQuestion = Question(1, 'question', 2, 'a', 'b', 'c', 'd', 60, 10)
-            newQuestion.addQuestionToDatabase()
-            newQuestion.getQuestionFromDatabase()
-
-            # to do: change hardcoded question to input from user
-
-            # test: from database to json format to send to server
-            newQuestion.sendQuestionToServer()
-
-        btnDatabase = Button(self, text='Insert databases', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=insertDataInDatabase).pack()
-        btnStartServer = Button(self, text='Start server', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizScreen)).pack()
-        btnStartQuiz = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
-'''
 
 # screen WAITING QUIZ (temporary quiz1)
 class HostQuizWaitingScreen(BaseScreen):
@@ -369,24 +394,28 @@ class HostQuizWaitingScreen(BaseScreen):
         self.server = self.args[0]
         self.start = False
 
-        label1 = Label(self, text='Host Quiz', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
         self.startServer()
-
-        self.waitingLabel = Label(self, text='Waiting for players...', fg='black', font=('arial', 12, 'bold'))
+        
+        # layout
+        self.configure(bg=self.setBackgroundColor())
+        
+        self.createLabel('Host Quiz', 'title').pack(side="top", fill="x", pady=30)
+        
+        self.waitingLabel = self.createLabel('Waiting for players...', 'default')
         self.waitingLabel.pack(side="top", fill="x", pady=5)
         
-        self.playersLabel = Label(self, text=f"{str(len(self.server.clients))} players are connected", fg='black',font=('arial', 15, 'bold'))
+        self.playersLabel = self.createLabel('f"{str(len(self.server.clients))} players are connected"', 'default')
         self.playersLabel.pack()
 
-        self.continueButton = Button(self, text='Enough players', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: self.stopThread())
+        self.continueButton = self.createButton('Enough players', 'confirm', lambda: self.stopThread())
         self.continueButton.pack()
         
-        button2 = Button(self, text='Return', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HomeScreen)).pack()
+        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x",pady=20)
 
         #IMPORTANT: when we return, we probably have to shut down the server instance so it can be started again on the previous screen
         #I don't know how to do this
         #halp
-
+        
         x = threading.Thread(target=self.updateInterface).start()
 
     def updateInterface(self):
@@ -401,6 +430,16 @@ class HostQuizWaitingScreen(BaseScreen):
                 break
             else:
                 self.playersLabel.config(text = f"{str(len(self.server.clients))} players are connected")
+    
+    def startServer(self):
+        print("start server")
+        self.server.host()
+
+    def stopThread(self):
+        # stop thread:
+        print("stop thread")
+        self.start = True
+
     def startServer(self):
         print("start server")
         self.server.host()
@@ -411,6 +450,7 @@ class HostQuizWaitingScreen(BaseScreen):
         self.start = True
 
 
+# screen HOST QUIZ START
 class HostQuizStartScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
@@ -422,6 +462,8 @@ class HostQuizStartScreen(BaseScreen):
             self.getArguments(*args)
 
         self.server = self.args[0]
+
+        self.configure(bg=self.setBackgroundColor())
         
         #at what question are we?
         if self.args[1] == 0:
@@ -458,33 +500,6 @@ class HostQuizStartScreen(BaseScreen):
     def endQuiz(self):
         self.server.endQuiz()
         self.master.switch_frame(HomeScreen)
-        
-
-    '''
-    def sendFirstQuestion():
-        # import from db with correct quizId
-        quizId = 1
-        newQuestion = Question()
-        quiz = newQuestion.createQuizWithQuestions(quizId)
-
-        self.server.setQuestionList(quiz)
-
-        self.server.handleNextQuestion()
-
-        # waiting screen that informs player that all questions are being answered
-
-        self.server.waitAndSendScores()
-
-
-        # show scoreboard to players
-        # to do new screen:
-
-        # PROBLEM: new screen only shows AFTER players answer first question
-        label1 = Label(self, text='Players are answering...', fg='black', font=('arial', 24, 'bold')).pack(
-                side="top", fill="x", pady=5)
-
-        sendFirstQuestion()
-    '''
 
 class HostQuizQuestionScreen(BaseScreen):
     # master = self from QuizApp
@@ -518,7 +533,7 @@ class HostQuizQuestionScreen(BaseScreen):
             button = Button(self, text='View scores', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),command=lambda: master.switch_frame(HostQuizStartScreen, self.server, self.position+1))
             button.pack()
 
-# screen JOIN QUIZ
+# screen JOIN QUIZ NOT UPDATED LAYOUT
 class JoinQuizScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
