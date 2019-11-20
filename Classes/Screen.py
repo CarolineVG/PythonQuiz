@@ -423,8 +423,9 @@ class HostQuizStartScreen(BaseScreen):
 
         self.server = self.args[0]
         
-        #at what question are we? If no position is specified, this is the first question.
-        if len(self.args) > 1 and self.args[1] == 0:
+        #at what question are we?
+        if self.args[1] == 0:
+            # If position is 0 this is the first question.
             position = self.args[1]
             button = Button(self, text='Send the first question!', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'),command=lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position))
             button.pack()
@@ -435,13 +436,28 @@ class HostQuizStartScreen(BaseScreen):
             # show scoreboard
             scores = self.server.getSortedScores()
 
-            label1 = Label(self, text='Scoreboard:', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
+            title = Label(self, text='Scoreboard:', fg='black', font=('arial', 24, 'bold'))
+            title.pack(side="top", fill="x", pady=5)
 
             for player in scores:
-                label2 = Label(self, text=str(player[1])+" - "+str(player[0]), fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
-            
-            button = Button(self, text='Send the next question!', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position)).pack()
+                label2 = Label(self, text=str(player[0])+" - "+str(player[1]), fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=5)
 
+            if self.args[1] == len(self.server.questionList):
+                title.config(text="Final scores:")
+
+                label1 = Label(self, text=f"The winner is {scores[0][0]}!", fg='black', font=('arial', 18, 'bold')).pack(side="top", fill="x", pady=5)
+                if len(scores) > 1:
+                    label1 = Label(self, text=f"{scores[1][0]} came in second.", fg='black', font=('arial', 14, 'bold')).pack(side="top", fill="x", pady=5)
+                if len(scores) > 2:
+                    label1 = Label(self, text=f"{scores[3][0]} came in third.", fg='black', font=('arial', 12, 'bold')).pack(side="top", fill="x", pady=5)
+
+                button = Button(self, text='End quiz', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: self.endQuiz()).pack()
+            else:
+                button = Button(self, text='Send the next question!', fg='black', relief=FLAT, width=16, font=('arial', 20, 'bold'), command=lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position)).pack()
+
+    def endQuiz(self):
+        self.server.endQuiz()
+        self.master.switch_frame(HomeScreen)
         
 
     '''
