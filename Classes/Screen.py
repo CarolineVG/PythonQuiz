@@ -508,6 +508,7 @@ class HostQuizQuestionScreen(BaseScreen):
 
         # extend from BaseScreen
         BaseScreen.__init__(self, master)
+        self.master = master
 
         if args:
             self.getArguments(*args)
@@ -525,15 +526,18 @@ class HostQuizQuestionScreen(BaseScreen):
 
         for item in self.server.questionList[self.position]["options"]:
             self.createLabel(self.server.questionList[self.position]["options"][item], 'default').pack(side="top", fill="x", pady=5)
-
-        self.server.handleNextQuestion()
         
-        label3 = self.createLabel('Players are answering...', 'default')
-        label3.pack(side="top", fill="x", pady=5)
+        self.status = self.createLabel('Players are answering...', 'default')
+        self.status.pack(side="top", fill="x", pady=5)
+
+        x = threading.Thread(target=self.sendQuestion).start()
+
+    def sendQuestion(self):
+        self.server.handleNextQuestion()
 
         if self.server.wait():
-            label3.destroy()
-            self.createButton('View scores', 'confirm', lambda: master.switch_frame(HostQuizScoreScreen, self.server, self.position+1)).pack()
+            self.status.destroy()
+            self.createButton('View scores', 'confirm', lambda: self.master.switch_frame(HostQuizScoreScreen, self.server, self.position+1)).pack()
 
 # screen JOIN QUIZ NOT UPDATED LAYOUT
 class JoinQuizScreen(BaseScreen):
@@ -623,13 +627,49 @@ class JoinQuizQuestionScreen(BaseScreen):
         options = self.client.getQuestionOptions()
         for option in options:
             self.createButton(options[option], 'default', lambda option=option: self.answer(option)).pack()
-        # antwoorden wanneer op button geklikt wordt.
-        # wacht scherm
-        # scoreboard
-        # repeat
 
     def answer(self, option):
         self.client.answer(option)
+        self.master.switch_frame(JoinQuizWaitingScreen, self.client)
         
+class JoinQuizWaitingScreen(BaseScreen):
+    # master = self from QuizApp
+    def __init__(self, master, *args):
+
+        # extend from BaseScreen
+        BaseScreen.__init__(self, master)
+
+        if args:
+            self.getArguments(*args)
+
+        self.client = self.args[0]
+        
+        # layout
+        self.configure(bg=self.setBackgroundColor())
+
+        self.createLabel("Your answer was send.", 'default').pack()
 
         
+        x = threading.Thread(target=self.receiveQuestion).start()
+        
+    def receiveQuestion(self):
+        self.createLabel('Now waiting for other players to answer...', 'default').pack()
+        self.client.listen()
+        print("done listening")
+        if client.getScores() != None:
+            self.master.switch_frame(JoinQuizScoreScreen, self.client)
+        
+class JoinQuizScoreScreen(BaseScreen):
+    # master = self from QuizApp
+    def __init__(self, master, *args):
+
+        # extend from BaseScreen
+        BaseScreen.__init__(self, master)
+
+        if args:
+            self.getArguments(*args)
+
+        self.client = self.args[0]
+        
+        # layout
+        self.configure(bg=self.setBackgroundColor())
