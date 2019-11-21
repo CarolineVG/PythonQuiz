@@ -619,6 +619,8 @@ class JoinQuizQuestionScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
 
+        print("1")
+
         # extend from BaseScreen
         BaseScreen.__init__(self, master)
 
@@ -626,20 +628,47 @@ class JoinQuizQuestionScreen(BaseScreen):
             self.getArguments(*args)
 
         self.client = self.args[0]
+        self.answered = False
+
+        print("2")
         
         # layout
         self.configure(bg=self.setBackgroundColor())
 
         self.createLabel(self.client.getQuestion(), 'title').pack(side="top", fill="x", pady=30)
 
-        # options als buttons tonen
+
+        print("3")
         options = self.client.getQuestionOptions()
         for option in options:
             self.createButton(options[option], 'default', lambda option=option: self.answer(option)).pack()
-
+        
+        if self.client.getTime() != None:
+            x = threading.Thread(target=lambda: self.countdown(self.client.getTime())).start()
+        print("4")
+        
     def answer(self, option):
-        self.client.answer(option)
-        self.master.switch_frame(JoinQuizWaitingScreen, self.client)
+        if self.answered == False:
+            self.client.answer(option)
+            self.answered = True
+            self.master.switch_frame(JoinQuizWaitingScreen, self.client)
+
+    def countdown(self, seconds):
+
+        print("countdown")
+        
+        timer = self.createLabel("Time: "+str(seconds), 'default')
+        timer.pack()
+
+        while self.answered == False:
+            time.sleep(1)
+            timer.config(text="Time: "+str(seconds))
+            if seconds <= 0:
+                self.client.answer(False)
+                self.answered = True
+                self.master.switch_frame(JoinQuizWaitingScreen, self.client, "timeout")
+                break
+            seconds = seconds - 1
         
 class JoinQuizWaitingScreen(BaseScreen):
     # master = self from QuizApp
@@ -652,16 +681,20 @@ class JoinQuizWaitingScreen(BaseScreen):
             self.getArguments(*args)
 
         self.client = self.args[0]
-        
+
         # layout
         self.configure(bg=self.setBackgroundColor())
 
-        self.createLabel("Your answer was send.", 'default').pack()
+        if len(self.args) > 1 and self.args[1] == "timeout":
+            self.createLabel("You didn't answer in time!", 'default').pack()
+            self.createLabel('Waiting on Quiz host', 'default').pack()
+        else:
+            self.createLabel("Your answer was send.", 'default').pack()
+            self.createLabel('Now waiting for other players to answer...', 'default').pack()
         
         x = threading.Thread(target=self.receiveScores).start()
         
     def receiveScores(self):
-        self.createLabel('Now waiting for other players to answer...', 'default').pack()
         self.client.listen()
         print("done listening")
         if self.client.getScores() != None:

@@ -325,10 +325,10 @@ class Client:
         else:
             print("You couldn't answer. Either no question was asked or you were too late.")
 
-    def getTimer(self):
+    def getTime(self):
         if self.newQuestion != None:
-            if 'timer' in self.lastMessage:
-                return self.newQuestion['timer']
+            if 'time' in self.lastMessage:
+                return self.newQuestion['time']
             else:
                 return None
         else:
