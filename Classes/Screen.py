@@ -648,15 +648,14 @@ class JoinQuizWaitingScreen(BaseScreen):
         self.configure(bg=self.setBackgroundColor())
 
         self.createLabel("Your answer was send.", 'default').pack()
-
         
-        x = threading.Thread(target=self.receiveQuestion).start()
+        x = threading.Thread(target=self.receiveScores).start()
         
-    def receiveQuestion(self):
+    def receiveScores(self):
         self.createLabel('Now waiting for other players to answer...', 'default').pack()
         self.client.listen()
         print("done listening")
-        if client.getScores() != None:
+        if self.client.getScores() != None:
             self.master.switch_frame(JoinQuizScoreScreen, self.client)
         
 class JoinQuizScoreScreen(BaseScreen):
@@ -673,3 +672,24 @@ class JoinQuizScoreScreen(BaseScreen):
         
         # layout
         self.configure(bg=self.setBackgroundColor())
+
+        scores = self.client.getScores()
+
+        title = self.createLabel('Scoreboard:', 'title')
+        title.pack(side="top", fill="x", pady=30)
+
+        for player in scores:
+            self.createLabel(str(player[0])+" - "+str(player[1]), 'default').pack(side="top", fill="x", pady=5)
+
+        x = threading.Thread(target=self.receiveQuestion).start()
+        
+    def receiveQuestion(self):
+        self.createLabel('Get ready for the next question...', 'default').pack()
+        self.client.listen()
+        print("done listening")
+        if self.client.getQuestion() != None:
+            self.master.switch_frame(JoinQuizQuestionScreen, self.client)
+
+        
+
+        
