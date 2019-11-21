@@ -28,27 +28,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Classes/Screen.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="470">
-              <caret line="320" column="39" lean-forward="true" selection-start-line="320" selection-start-column="39" selection-end-line="320" selection-end-column="39" />
+            <state relative-caret-position="443">
+              <caret line="264" column="28" lean-forward="true" selection-start-line="264" selection-start-column="28" selection-end-line="264" selection-end-column="28" />
               <folding>
-                <element signature="e#297#1233#0" />
-                <element signature="e#5540#6113#0" />
-                <element signature="e#18738#19944#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Classes/Question.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="311">
-              <caret line="46" column="44" selection-start-line="46" selection-start-column="44" selection-end-line="46" selection-end-column="44" />
-              <folding>
-                <element signature="e#17#28#0" expanded="true" />
+                <element signature="e#272#1208#0" />
+                <element signature="e#5515#6088#0" />
+                <element signature="e#6139#7009#0" />
+                <element signature="e#7073#8443#0" />
+                <element signature="e#11361#12970#0" />
+                <element signature="e#15438#17413#0" />
+                <element signature="e#17461#18667#0" />
+                <element signature="e#18745#19951#0" />
               </folding>
             </state>
           </provider>
@@ -78,6 +71,10 @@
       <find>server</find>
       <find>hostQuiz</find>
       <find>createQuizId</find>
+      <find>global</find>
+      <find>config</find>
+      <find>arg</find>
+      <find>disabled</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -110,9 +107,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-7" />
-    <option name="width" value="1335" />
-    <option name="height" value="1047" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="976" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -328,6 +326,7 @@
       <workItem from="1574092531541" duration="114000" />
       <workItem from="1574165297058" duration="10780000" />
       <workItem from="1574268533345" duration="1453000" />
+      <workItem from="1574349425966" duration="2806000" />
     </task>
     <task id="LOCAL-00001" summary="Add basic home and quiz screen">
       <created>1570805045185</created>
@@ -340,7 +339,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="96735000" />
+    <option name="totallyTimeSpent" value="99541000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -355,12 +354,12 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.496208" visible="true" weight="0.12953092" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.496208" visible="true" weight="0.030916844" />
       <window_info id="Structure" order="1" sideWeight="0.503792" side_tool="true" weight="0.13859275" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.17226435" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.276273" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -388,7 +387,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/PythonQuiz$server.coverage" NAME="server Coverage Results" MODIFIED="1573138166355" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/sockets" />
     <SUITE FILE_PATH="coverage/PythonQuiz$gradient.coverage" NAME="gradient Coverage Results" MODIFIED="1574082888504" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testquiz" />
-    <SUITE FILE_PATH="coverage/PythonQuiz$home.coverage" NAME="home Coverage Results" MODIFIED="1574269904035" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PythonQuiz$home.coverage" NAME="home Coverage Results" MODIFIED="1574352222808" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/PythonQuiz$main.coverage" NAME="main Coverage Results" MODIFIED="1571564186014" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testquiz" />
     <SUITE FILE_PATH="coverage/PythonQuiz$sockets.coverage" NAME="sockets Coverage Results" MODIFIED="1572947176514" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/sockets" />
     <SUITE FILE_PATH="coverage/PythonQuiz$client.coverage" NAME="client Coverage Results" MODIFIED="1572947844439" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/sockets" />
@@ -541,24 +540,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Classes/Screen.py">
+    <entry file="file://$PROJECT_DIR$/Classes/Question.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="470">
-          <caret line="320" column="39" lean-forward="true" selection-start-line="320" selection-start-column="39" selection-end-line="320" selection-end-column="39" />
+        <state relative-caret-position="352">
+          <caret line="16" column="25" lean-forward="true" selection-start-line="16" selection-start-column="25" selection-end-line="16" selection-end-column="25" />
           <folding>
-            <element signature="e#297#1233#0" />
-            <element signature="e#5540#6113#0" />
-            <element signature="e#18738#19944#0" />
+            <element signature="e#17#28#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Classes/Question.py">
+    <entry file="file://$PROJECT_DIR$/Classes/Screen.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="311">
-          <caret line="46" column="44" selection-start-line="46" selection-start-column="44" selection-end-line="46" selection-end-column="44" />
+        <state relative-caret-position="443">
+          <caret line="264" column="28" lean-forward="true" selection-start-line="264" selection-start-column="28" selection-end-line="264" selection-end-column="28" />
           <folding>
-            <element signature="e#17#28#0" expanded="true" />
+            <element signature="e#272#1208#0" />
+            <element signature="e#5515#6088#0" />
+            <element signature="e#6139#7009#0" />
+            <element signature="e#7073#8443#0" />
+            <element signature="e#11361#12970#0" />
+            <element signature="e#15438#17413#0" />
+            <element signature="e#17461#18667#0" />
+            <element signature="e#18745#19951#0" />
           </folding>
         </state>
       </provider>
