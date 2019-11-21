@@ -6,10 +6,6 @@ from Classes.Question import Question
 from Classes.Sockets import Server
 from Classes.Sockets import Client
 
-
-# global server var AANPASSEN GEEN GLOBAL VARS GEBRUIKEN!!
-createQuizId = 0
-
 # class QuizApp
 class QuizApp(Tk):
     def __init__(self):
@@ -64,7 +60,7 @@ class BaseScreen(Frame):
         self.buttonForeColor = "#850001"
         self.buttonBackColor = "#FFF"
         self.buttonActiveForeColor = "#850001"
-        self.buttonActiveBackColor = "#FFFFF0"
+        self.buttonActiveBackColor = "#EDEDED"
         self.buttonWidth = 18
         self.buttonFontFamily = self.fontFamily
         self.buttonFontSize = 18
@@ -86,9 +82,13 @@ class BaseScreen(Frame):
     def setBackgroundColor(self):
         return self.backgroundColor
 
-    def createButton(self, text, type, method):
-        if type == None:
-            type = "default"
+    def createButton(self, text, type, method, *state):
+        if state:
+            print('test ' + str(text))
+            arg = state[0]
+            self.newState = arg
+        else:
+            self.newState = 'normal'
 
         # methods:
         # function or switch screen
@@ -101,9 +101,9 @@ class BaseScreen(Frame):
             newButtonForeColor = "#FFF"
             newButtonBackColor = "green"
             newButtonActiveForeColor = "#FFF"
-            newButtonActiveBackColor = "#7BC17E"
+            newButtonActiveBackColor = "#5E9858"
 
-            button = Button(self, text=text, fg=newButtonForeColor, bg=newButtonBackColor,
+            button = Button(self, text=text, fg=newButtonForeColor, bg=newButtonBackColor, state = self.newState,
                           activeforeground=newButtonActiveForeColor, activebackground=newButtonActiveBackColor,
                           relief=FLAT, width=self.buttonWidth, font=(self.buttonFontFamily, self.buttonFontSize, self.buttonFontType), command=method)
 
@@ -113,9 +113,9 @@ class BaseScreen(Frame):
             newButtonForeColor = "#FFF"
             newButtonBackColor = "#92050C"
             newButtonActiveForeColor = "#FFF"
-            newButtonActiveBackColor = "#92050C"
+            newButtonActiveBackColor = "#B15943"
 
-            button = Button(self, text=text, fg=newButtonForeColor, bg=newButtonBackColor,
+            button = Button(self, text=text, fg=newButtonForeColor, bg=newButtonBackColor, state = self.newState,
                             activeforeground=newButtonActiveForeColor, activebackground=newButtonActiveBackColor,
                             relief=FLAT, width=self.buttonWidth,
                             font=(self.buttonFontFamily, self.buttonFontSize, self.buttonFontType), command=method)
@@ -123,7 +123,7 @@ class BaseScreen(Frame):
         # DEFAULT button
         elif type == "default":
             # default buttons, no vars to change
-            button = Button(self, text=text, fg=self.buttonForeColor, bg=self.buttonBackColor,
+            button = Button(self, text=text, fg=self.buttonForeColor, bg=self.buttonBackColor, state = self.newState,
                           activeforeground=self.buttonActiveForeColor, activebackground=self.buttonActiveBackColor,
                           relief=FLAT,
                           width=self.buttonWidth,
@@ -225,8 +225,11 @@ class CreateQuizScreen(BaseScreen):
         self.createLabel('Quiz Name*', 'default').pack(side="top", fill="x", pady=30)
         self.createInput(self.quizValue, 'default').pack()
 
-        self.createButton('Save', 'confirm', self.saveQuiz).pack(side="top",fill="x",pady=10)
-        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top",fill="x",pady=10)
+        self.saveButton = self.createButton('Save', 'confirm', lambda: self.saveQuiz())
+        self.saveButton.pack(side="top",fill="x",pady=10)
+
+        self.returnButton = self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen))
+        self.returnButton.pack(side="top",fill="x",pady=10)
 
     def saveQuiz(self):
         q = self.quizValue.get()
@@ -242,12 +245,10 @@ class CreateQuizScreen(BaseScreen):
         createQuizId = result[0]
         print(createQuizId)
 
-        # add questions button
-        self.createButton('Add Questions', 'confirm', lambda: self.master.switch_frame(CreateQuestionScreen, createQuizId)).pack(
-            side="top", fill="x", pady=10)
-
-        # disable save button and return button (you can't make an empty quiz)
-        # to do ...
+        # change button
+        self.saveButton.config(text='Add Questions',command=lambda: self.master.switch_frame(CreateQuestionScreen, createQuizId))
+        # disable return button (you can't make an empty quiz)
+        self.returnButton.destroy()
 
 
 # screen CREATE QUESTION QUIZ
@@ -279,19 +280,25 @@ class CreateQuestionScreen(BaseScreen):
         self.createLabel('Quiz', 'title').pack(side="top", fill="x", pady=30)
 
         self.createLabel('Question', 'default').pack()
-        self.createInput(self.questionValue, 'default').pack()
+        self.questionInput = self.createInput(self.questionValue, 'default')
+        self.questionInput.pack()
+
 
         self.createLabel('Answer 1', 'default').pack()
-        self.createInput(self.answer1Value, 'default').pack()
+        self.answer1Input = self.createInput(self.answer1Value, 'default')
+        self.answer1Input.pack()
 
         self.createLabel('Answer 2', 'default').pack()
-        self.createInput(self.answer2Value, 'default').pack()
+        self.answer2Input = self.createInput(self.answer2Value, 'default')
+        self.answer2Input.pack()
 
         self.createLabel('Answer 3', 'default').pack()
-        self.createInput(self.answer3Value, 'default').pack()
+        self.answer3Input = self.createInput(self.answer3Value, 'default')
+        self.answer3Input.pack()
 
         self.createLabel('Answer 4', 'default').pack()
-        self.createInput(self.answer4Value, 'default').pack()
+        self.answer4Input = self.createInput(self.answer4Value, 'default')
+        self.answer4Input.pack()
 
         # TO DO: LAYOUT
         solutionLabel = Label(self, text='Correct answer', fg='black', font=('arial', 16, 'bold')).pack()
@@ -300,9 +307,11 @@ class CreateQuestionScreen(BaseScreen):
         r3 = Radiobutton(self, text='3', variable=self.solutionValue, value='option3').pack()
         r4 = Radiobutton(self, text='4', variable=self.solutionValue, value='option4').pack()
 
-        self.createButton('Save and next question', 'confirm', lambda: self.addQuestion()).pack(side="top", fill="x",pady=20)
-        self.createButton('Finish Quiz', 'confirm', lambda: master.switch_frame(HostQuizScreen)).pack(side="top", fill="x",pady=20)
-        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x",pady=20)
+        self.saveQuestionButton = self.createButton('Save Question', 'confirm', lambda: self.addQuestion())
+        self.saveQuestionButton.pack(side="top", fill="x",pady=10)
+
+        self.finishQuizButton = self.createButton('Finish Quiz', 'confirm', lambda: master.switch_frame(HostQuizScreen), 'disabled')
+        self.finishQuizButton.pack(side="top", fill="x",pady=10)
 
     def addQuestion(self):
         # create new Quiz
@@ -315,15 +324,21 @@ class CreateQuestionScreen(BaseScreen):
         a4 = self.answer4Value.get()
         s = self.solutionValue.get()
 
-        # create new Question: temp: 2 = solution
+        # create new Question:
         newQuestion = Question()
         newQuestion.addQuestion(self.quizId, q, s, a1, a2, a3, a4, 60, 10)
         newQuestion.addQuestionToDatabase()
         newQuestion.getQuestionFromDatabase()
 
         # empty everything for new question
-        # TO DO...
+        self.questionValue.set("")
+        self.answer1Value.set("")
+        self.answer2Value.set("")
+        self.answer3Value.set("")
+        self.answer4Value.set("")
 
+        # change finish button from disabled to active
+        self.finishQuizButton.config(state="normal")
 
 # screen HOST QUIZ
 class HostQuizScreen(BaseScreen):
