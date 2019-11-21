@@ -684,12 +684,41 @@ class JoinQuizScoreScreen(BaseScreen):
         x = threading.Thread(target=self.receiveQuestion).start()
         
     def receiveQuestion(self):
-        self.createLabel('Get ready for the next question...', 'default').pack()
+        waitingMessage = self.createLabel('Get ready for the next question...', 'default')
+        waitingMessage.pack()
         self.client.listen()
         print("done listening")
-        if self.client.getQuestion() != None:
+        if self.client.ended:
+            self.master.switch_frame(JoinQuizEndScreen, self.client)
+            
+        elif self.client.getQuestion() != None:
             self.master.switch_frame(JoinQuizQuestionScreen, self.client)
 
-        
+class JoinQuizEndScreen(BaseScreen):        
+    # master = self from QuizApp
+    def __init__(self, master, *args):
 
+        # extend from BaseScreen
+        BaseScreen.__init__(self, master)
+
+        if args:
+            self.getArguments(*args)
+
+        self.client = self.args[0]
+        
+        # layout
+        self.configure(bg=self.setBackgroundColor())
+
+        scores = self.client.getScores()
+
+        if scores[0][0] == self.client.name:
+            self.createLabel('You won! Congratulations!', 'title').pack()
+        else:
+            self.createLabel(f'{scores[0][0]} won!', 'title').pack()
+        if (len(scores) >= 2) and (scores[1][0] == self.client.name):
+            self.createLabel('You came in second!', 'default').pack()
+        if (len(scores) >= 3) and (scores[2][0] == self.client.name):
+            self.createLabel('You came in third!', 'default').pack()
+        self.client.end()
+        self.createButton('Return to home screen', 'confirm', lambda: master.switch_frame(HomeScreen)).pack()
         
