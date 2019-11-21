@@ -344,9 +344,9 @@ class HostQuizScreen(BaseScreen):
 
         self.createLabel('Enter your IP:', 'default').pack(side="top", fill="x", pady=5)
 
-        self.ip = ""
+        self.ip = StringVar()
         
-        Entry(self, textvar=self.ip).pack()
+        self.createInput(self.ip, 'default').pack()
 
         self.createLabel('Choose which quiz to host:', 'default').pack(side="top", fill="x", pady=5)
 
@@ -367,7 +367,7 @@ class HostQuizScreen(BaseScreen):
             self.createButton(item[1], 'default', lambda quizId=quizId: self.next(quizId)).pack(side="top",fill="x", pady=20)
 
     def next(self, quizId):
-        ip = str(self.ip)
+        ip = self.ip.get()
         server = Server(ip, 5000)
 
         print("this should be our quiz id -> "+str(quizId))
@@ -546,13 +546,14 @@ class JoinQuizScreen(BaseScreen):
 
         # extend from BaseScreen
         BaseScreen.__init__(self, master)
+        self.master = master
 
         if args:
             self.getArguments(*args)
 
         # input vars
-        ipValue = ""
-        usernameValue = "User"
+        self.ipValue = StringVar()
+        self.usernameValue = StringVar()
 
         # layout
         self.configure(bg=self.setBackgroundColor())
@@ -560,16 +561,24 @@ class JoinQuizScreen(BaseScreen):
         self.createLabel('Join Quiz', 'title').pack(side="top", fill="x", pady=30)
         
         self.createLabel('Enter ip', 'default').pack()
-        Entry(self, textvar=ipValue).pack()
+        self.createInput(self.ipValue, 'default').pack()
 
         self.createLabel('Enter nickname', 'default').pack()
-        Entry(self, textvar=usernameValue).pack()
+        self.createInput(self.usernameValue, 'default').pack()
 
-        client = Client(ipValue, 5000)
-        client.setName(usernameValue)
-
-        self.createButton('Join', 'default', lambda: master.switch_frame(JoinQuizConnectScreen, client)).pack(side="top", fill="x", pady=20)
+        self.createButton('Join', 'default', lambda: self.join()).pack(side="top", fill="x", pady=20)
         self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack()
+
+    def join(self):
+        ip = self.ipValue.get()
+        client = Client(ip, 5000)
+        
+        username = self.usernameValue.get()
+        if username == "":
+            username = "User"
+        client.setName(username)
+
+        self.master.switch_frame(JoinQuizConnectScreen, client)
 
 class JoinQuizConnectScreen(BaseScreen):
     # master = self from QuizApp
