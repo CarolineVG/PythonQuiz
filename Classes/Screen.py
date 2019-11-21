@@ -4,6 +4,7 @@ from tkinter import *
 from Classes.Quiz import Quiz
 from Classes.Question import Question
 from Classes.Sockets import Server
+from Classes.Sockets import Client
 
 
 # global server var AANPASSEN GEEN GLOBAL VARS GEBRUIKEN!!
@@ -345,7 +346,7 @@ class HostQuizScreen(BaseScreen):
 
         self.ip = ""
         
-        input = Entry(self, textvar=self.ip).pack()
+        Entry(self, textvar=self.ip).pack()
 
         self.createLabel('Choose which quiz to host:', 'default').pack(side="top", fill="x", pady=5)
 
@@ -546,20 +547,71 @@ class JoinQuizScreen(BaseScreen):
             self.getArguments(*args)
 
         # input vars
-        pinValue = StringVar()
-        usernameValue = StringVar()
+        ipValue = ""
+        usernameValue = "User"
 
-        label1 = Label(self, text='Join Quiz', fg='black', font=('arial', 24, 'bold')).pack(side="top", fill="x",
-                                                                                                pady=5)
+        # layout
+        self.configure(bg=self.setBackgroundColor())
+        
+        self.createLabel('Join Quiz', 'title').pack(side="top", fill="x", pady=30)
+        
+        self.createLabel('Enter ip', 'default').pack()
+        Entry(self, textvar=ipValue).pack()
 
-        pinLabel = Label(self, text='Enter pin', fg='black', font=('arial', 16, 'bold')).pack()
-        pinInput = Entry(self, textvar=pinValue).pack()
+        self.createLabel('Enter nickname', 'default').pack()
+        Entry(self, textvar=usernameValue).pack()
 
-        usernameLabel = Label(self, text='Enter username', fg='black', font=('arial', 16, 'bold')).pack()
-        usernameInput = Entry(self, textvar=usernameValue).pack()
+        client = Client(ipValue, 5000)
+        client.setName(usernameValue)
 
-        button1 = Button(self, text='Participate', fg='black', relief=FLAT, width=16,
-                             font=('arial', 20, 'bold')).pack()
-        button2 = Button(self, text='Return', fg='black', relief=FLAT,
-                             width=16, font=('arial', 20, 'bold'),
-                             command=lambda: master.switch_frame(HomeScreen)).pack()
+        self.createButton('Join', 'default', lambda: master.switch_frame(JoinQuizConnectScreen, client)).pack(side="top", fill="x", pady=20)
+        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack()
+
+class JoinQuizConnectScreen(BaseScreen):
+    # master = self from QuizApp
+    def __init__(self, master, *args):
+
+        # extend from BaseScreen
+        BaseScreen.__init__(self, master)
+
+        if args:
+            self.getArguments(*args)
+
+        self.client = self.args[0]
+        
+        # layout
+        self.configure(bg=self.setBackgroundColor())
+
+        self.createLabel('Join Quiz', 'title').pack(side="top", fill="x", pady=30)
+
+        connectingLabel = self.createLabel('Connecting to host', 'default')
+        connectingLabel.pack()
+
+        if self.client.join():
+            connectingLabel.config(text="Connected!")
+            self.createLabel('Waiting for the Quiz master to send the first Question', 'default').pack()
+            #self.client.listen()
+            #if self.client.getQuestion() != None:
+                #master.switch_frame(HomeScreen).pack()
+        else:
+            connectingLabel.config(text="Failed to connect to host.")
+            self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack()
+
+class JoinQuizQuestionScreen(BaseScreen):
+    # master = self from QuizApp
+    def __init__(self, master, *args):
+
+        # extend from BaseScreen
+        BaseScreen.__init__(self, master)
+
+        if args:
+            self.getArguments(*args)
+
+        self.client = self.args[0]
+        
+        # layout
+        self.configure(bg=self.setBackgroundColor())
+
+        self.createLabel(self.client.getQuestion(), 'title').pack(side="top", fill="x", pady=30)
+
+        

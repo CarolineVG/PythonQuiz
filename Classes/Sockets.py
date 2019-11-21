@@ -228,10 +228,15 @@ class Client:
         self.ended = False
         self.endMessage = None
     
-    def join(self): #method for clients, may remove it later
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.connect((self.ip, self.port))
-        print("connected to a quiz host.")
+    def join(self):
+        try:
+            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.server.connect((self.ip, self.port))
+            print("connected to a quiz host.")
+            return True
+        except:
+            print("failed to connect.")
+            return False
 
     def setName(self, string):
         self.name = string
