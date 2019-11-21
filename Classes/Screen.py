@@ -573,6 +573,7 @@ class JoinQuizConnectScreen(BaseScreen):
 
         # extend from BaseScreen
         BaseScreen.__init__(self, master)
+        self.master = master
 
         if args:
             self.getArguments(*args)
@@ -589,13 +590,17 @@ class JoinQuizConnectScreen(BaseScreen):
 
         if self.client.join():
             connectingLabel.config(text="Connected!")
-            self.createLabel('Waiting for the Quiz master to send the first Question', 'default').pack()
-            #self.client.listen()
-            #if self.client.getQuestion() != None:
-                #master.switch_frame(HomeScreen).pack()
+            x = threading.Thread(target=self.receiveQuestion).start()
         else:
             connectingLabel.config(text="Failed to connect to host.")
             self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack()
+
+    def receiveQuestion(self):
+        self.createLabel('Waiting for the Quiz master to send the first Question', 'default').pack()
+        self.client.listen()
+        print("done listening")
+        if self.client.getQuestion() != None:
+            self.master.switch_frame(JoinQuizQuestionScreen, self.client)
 
 class JoinQuizQuestionScreen(BaseScreen):
     # master = self from QuizApp
@@ -613,5 +618,18 @@ class JoinQuizQuestionScreen(BaseScreen):
         self.configure(bg=self.setBackgroundColor())
 
         self.createLabel(self.client.getQuestion(), 'title').pack(side="top", fill="x", pady=30)
+
+        # options als buttons tonen
+        options = self.client.getQuestionOptions()
+        for option in options:
+            self.createButton(options[option], 'default', lambda option=option: self.answer(option)).pack()
+        # antwoorden wanneer op button geklikt wordt.
+        # wacht scherm
+        # scoreboard
+        # repeat
+
+    def answer(self, option):
+        self.client.answer(option)
+        
 
         
