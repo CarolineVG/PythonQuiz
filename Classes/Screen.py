@@ -143,6 +143,13 @@ class BaseScreen(Frame):
             newLabelFontType = 'bold'
 
             label = Label(self, text=text, fg=self.labelForeColor, bg=self.labelBackColor, font=(self.fontFamily, newLabelFontSize, newLabelFontType))
+        # TITLE
+        elif type == "heading1":
+            newLabelFontSize = 22
+            newLabelFontType = 'bold'
+
+            label = Label(self, text=text, fg=self.labelForeColor, bg=self.labelBackColor,
+                          font=(self.fontFamily, newLabelFontSize, newLabelFontType))
         # DEFAULT
         elif type == "default":
             label = Label(self, text=text, fg=self.labelForeColor, bg=self.labelBackColor,
@@ -160,28 +167,6 @@ class BaseScreen(Frame):
             inputfield = Entry(self, textvar=value, fg = self.entryForeColor, bg = self.entryBackColor, width = self.entryWidth, font = (self.entryFontFamily, self.entryFontSize, self.entryFontType))
 
         return inputfield
-
-
-# TEST screen
-class TestScreen(BaseScreen):
-    # master = self from QuizApp
-    def __init__(self, master, *args):
-
-        # extend from BaseScreen
-        BaseScreen.__init__(self, master)
-
-        if args:
-            self.getArguments(*args)
-
-        # bg color
-        self.configure(bg='#FE715B')
-
-        self.createButton('confirm', 'confirm', 'c').pack()
-        self.createButton('return', 'return', 'c').pack()
-        self.createButton('default', 'default', 'c').pack()
-
-
-        label1 = Label(self, text=self.args, fg='#850001', bg='#FE715B', font=('arial', 24, 'bold')).pack(side="top", fill="x", pady=30)
 
 
 # screen HOME
@@ -203,7 +188,6 @@ class HomeScreen(BaseScreen):
         self.createButton('Create Quiz', 'default', lambda: master.switch_frame(CreateQuizScreen)).pack(side="top", fill="x", pady=20)
         self.createButton('Host Quiz', 'default', lambda: master.switch_frame(HostQuizScreen, 'a')).pack(side="top",fill="x",pady=20)
         self.createButton('Play Quiz', 'default', lambda: master.switch_frame(JoinQuizScreen)).pack(side="top",fill="x",pady=20)
-        self.createButton('TEST', 'return', lambda: master.switch_frame(TestScreen, 1, 2)).pack(side="top",fill="x",pady=20)
 
 
 # screen CREATE QUIZ
@@ -342,6 +326,7 @@ class CreateQuestionScreen(BaseScreen):
         # change finish button from disabled to active
         self.finishQuizButton.config(state="normal")
 
+
 # screen HOST QUIZ
 class HostQuizScreen(BaseScreen):
     # master = self from QuizApp
@@ -411,7 +396,7 @@ class HostQuizScreen(BaseScreen):
         self.master.switch_frame(HostQuizWaitingScreen, server)
 
 
-# screen WAITING QUIZ (temporary quiz1)
+# screen WAITING QUIZ
 class HostQuizWaitingScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
@@ -440,7 +425,7 @@ class HostQuizWaitingScreen(BaseScreen):
         self.playersLabel = self.createLabel('f"{str(len(self.server.clients))} players are connected"', 'default')
         self.playersLabel.pack()
 
-        self.continueButton = self.createButton('Enough players', 'default', lambda: self.stopThread())
+        self.continueButton = self.createButton('Enough players', 'confirm', lambda: self.stopThread())
         self.continueButton.pack()
         
         self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x",pady=20)
@@ -496,42 +481,52 @@ class HostQuizScoreScreen(BaseScreen):
 
         self.server = self.args[0]
 
+        # layout
         self.configure(bg=self.setBackgroundColor())
-        
-        #at what question are we?
+
+        self.createLabel('Host Quiz', 'title').pack(side="top", fill="x", pady=30)
+
         if self.args[1] == 0:
-            # If position is 0 this is the first question.
+            # first question
             position = self.args[1]
-            self.createButton('Send the first question!', 'default', lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position)).pack()
+            self.sendQuestionButton = self.createButton('Send First Question', 'confirm', lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position))
+            self.sendQuestionButton.pack()
         else:
-            position = self.args[1]
-            # send scores to clients
-            self.server.sendScores()
-            # show scoreboard
-            scores = self.server.getSortedScores()
+            # score
+            self.showScore()
 
-            title = self.createLabel('Scoreboard:', 'title')
-            title.pack(side="top", fill="x", pady=30)
+    def showScore(self):
+        position = self.args[1]
+        # send scores to clients
+        self.server.sendScores()
+        # show scoreboard
+        scores = self.server.getSortedScores()
 
-            for player in scores:
-                self.createLabel(str(player[0])+" - "+str(player[1]), 'default').pack(side="top", fill="x", pady=5)
+        # layout
+        title = self.createLabel('Scoreboard', 'heading1')
+        title.pack(side="top", fill="x", pady=5)
 
-            if self.args[1] == len(self.server.questionList):
-                title.config(text="Final scores:")
+        for player in scores:
+            self.createLabel(str(player[0])+" - "+str(player[1]) + " points", 'default').pack(side="top", fill="x", pady=5)
 
-                self.createLabel(f"The winner is {scores[0][0]}!", 'default').pack(side="top", fill="x", pady=5)
-                if len(scores) > 1:
-                    self.createLabel(f"{scores[1][0]} came in second.", 'default').pack(side="top", fill="x", pady=5)
-                if len(scores) > 2:
-                    self.createLabel(f"{scores[3][0]} came in third.", 'default').pack(side="top", fill="x", pady=5)
-                self.createButton('End quiz', 'default', lambda: self.endQuiz()).pack()
-            else:
-                self.createButton('Send the next question!', 'default', lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position)).pack()
+        if self.args[1] == len(self.server.questionList):
+            title.config(text="Final scores:")
+
+            self.createLabel(f"The winner is {scores[0][0]}!", 'default').pack(side="top", fill="x", pady=5)
+            if len(scores) > 1:
+                self.createLabel(f"{scores[1][0]} came in second.", 'default').pack(side="top", fill="x", pady=5)
+            if len(scores) > 2:
+                self.createLabel(f"{scores[3][0]} came in third.", 'default').pack(side="top", fill="x", pady=5)
+            self.createButton('End quiz', 'confirm', lambda: self.endQuiz()).pack()
+        else:
+            self.createButton('Send the next question!', 'confirm', lambda: self.master.switch_frame(HostQuizQuestionScreen, self.server, position)).pack()
 
     def endQuiz(self):
         self.server.endQuiz()
         self.master.switch_frame(HomeScreen)
 
+
+# screen HOST QUIZ QUESTION
 class HostQuizQuestionScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
@@ -549,18 +544,23 @@ class HostQuizQuestionScreen(BaseScreen):
         
         self.position = self.args[1]
 
-        #layout
+        # layout
         self.configure(bg=self.setBackgroundColor())
 
-        self.createLabel('current question:', 'default').pack(side="top", fill="x", pady=5)
+        self.createLabel('Host Quiz', 'title').pack(side="top", fill="x", pady=30)
 
-        self.createLabel(self.server.questionList[self.position]["question"], 'title').pack(side="top", fill="x", pady=5)
+        self.createLabel('Current Question', 'heading1').pack(side="top", fill="x", pady=5)
 
+        self.createLabel(self.server.questionList[self.position]["question"], 'default').pack(side="top", fill="x", pady=5)
+
+        self.createLabel('Answers', 'heading1').pack(side="top", fill="x", pady=5)
+
+        # show answers
         for item in self.server.questionList[self.position]["options"]:
-            self.createLabel(self.server.questionList[self.position]["options"][item], 'default').pack(side="top", fill="x", pady=5)
+            self.createLabel('- ' + str(self.server.questionList[self.position]["options"][item]), 'default').pack(side="top", fill="x", pady=5)
         
         self.status = self.createLabel('Players are answering...', 'default')
-        self.status.pack(side="top", fill="x", pady=5)
+        self.status.pack(side="top", fill="x", pady=30)
 
         x = threading.Thread(target=self.sendQuestion).start()
 
@@ -569,9 +569,10 @@ class HostQuizQuestionScreen(BaseScreen):
 
         if self.server.wait():
             self.status.destroy()
-            self.createButton('View scores', 'confirm', lambda: self.master.switch_frame(HostQuizScoreScreen, self.server, self.position+1)).pack()
+            self.createButton('View scores', 'confirm', lambda: self.master.switch_frame(HostQuizScoreScreen, self.server, self.position+1)).pack(side="top", fill="x", pady=20)
 
-# screen JOIN QUIZ NOT UPDATED LAYOUT
+
+# screen JOIN QUIZ
 class JoinQuizScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
@@ -612,6 +613,8 @@ class JoinQuizScreen(BaseScreen):
 
         self.master.switch_frame(JoinQuizConnectScreen, client)
 
+
+# screen JOIN QUIZ CONNECT
 class JoinQuizConnectScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
@@ -647,6 +650,8 @@ class JoinQuizConnectScreen(BaseScreen):
         if self.client.getQuestion() != None:
             self.master.switch_frame(JoinQuizQuestionScreen, self.client)
 
+
+# screen JOIN QUIZ QUESTION
 class JoinQuizQuestionScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
@@ -667,13 +672,15 @@ class JoinQuizQuestionScreen(BaseScreen):
         # layout
         self.configure(bg=self.setBackgroundColor())
 
-        self.createLabel(self.client.getQuestion(), 'title').pack(side="top", fill="x", pady=30)
+        self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
+
+        self.createLabel(self.client.getQuestion(), 'heading1').pack(side="top", fill="x", pady=5)
 
 
         print("3")
         options = self.client.getQuestionOptions()
         for option in options:
-            self.createButton(options[option], 'default', lambda option=option: self.answer(option)).pack()
+            self.createButton(options[option], 'default', lambda option=option: self.answer(option)).pack(side="top", fill="x", pady=20)
         
         if self.client.getTime() != None:
             x = threading.Thread(target=lambda: self.countdown(self.client.getTime())).start()
@@ -701,7 +708,9 @@ class JoinQuizQuestionScreen(BaseScreen):
                 self.master.switch_frame(JoinQuizWaitingScreen, self.client, "timeout")
                 break
             seconds = seconds - 1
-        
+
+
+# screen JOIN QUIZ WAITING
 class JoinQuizWaitingScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
@@ -717,12 +726,15 @@ class JoinQuizWaitingScreen(BaseScreen):
         # layout
         self.configure(bg=self.setBackgroundColor())
 
+        self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
+
+
         if len(self.args) > 1 and self.args[1] == "timeout":
             self.createLabel("You didn't answer in time!", 'default').pack()
             self.createLabel('Waiting on Quiz host', 'default').pack()
         else:
-            self.createLabel("Your answer was send.", 'default').pack()
-            self.createLabel('Now waiting for other players to answer...', 'default').pack()
+            self.createLabel("Your answer was sent.", 'default').pack()
+            self.createLabel('Please wait for other players to answer...', 'default').pack()
         
         x = threading.Thread(target=self.receiveScores).start()
         
@@ -731,7 +743,9 @@ class JoinQuizWaitingScreen(BaseScreen):
         print("done listening")
         if self.client.getScores() != None:
             self.master.switch_frame(JoinQuizScoreScreen, self.client)
-        
+
+
+# screen JOIN QUIZ SCORE
 class JoinQuizScoreScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
@@ -749,8 +763,10 @@ class JoinQuizScoreScreen(BaseScreen):
 
         scores = self.client.getScores()
 
-        title = self.createLabel('Scoreboard:', 'title')
-        title.pack(side="top", fill="x", pady=30)
+        self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
+
+        title = self.createLabel('Scoreboard:', 'heading')
+        title.pack(side="top", fill="x", pady=5)
 
         for player in scores:
             self.createLabel(str(player[0])+" - "+str(player[1]), 'default').pack(side="top", fill="x", pady=5)
@@ -768,6 +784,8 @@ class JoinQuizScoreScreen(BaseScreen):
         elif self.client.getQuestion() != None:
             self.master.switch_frame(JoinQuizQuestionScreen, self.client)
 
+
+# screen JOIN QUIZ END
 class JoinQuizEndScreen(BaseScreen):        
     # master = self from QuizApp
     def __init__(self, master, *args):
@@ -786,13 +804,13 @@ class JoinQuizEndScreen(BaseScreen):
         scores = self.client.getScores()
 
         if scores[0][0] == self.client.name:
-            self.createLabel('You won! Congratulations!', 'title').pack()
+            self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
+            self.createLabel('You won! Congratulations!', 'heading1').pack(side="top", fill="x", pady=5)
         else:
-            self.createLabel(f'{scores[0][0]} won!', 'title').pack()
+            self.createLabel(f'{scores[0][0]} won!', 'heading1').pack(side="top", fill="x", pady=5)
         if (len(scores) >= 2) and (scores[1][0] == self.client.name):
             self.createLabel('You came in second!', 'default').pack()
         if (len(scores) >= 3) and (scores[2][0] == self.client.name):
             self.createLabel('You came in third!', 'default').pack()
         self.client.end()
         self.createButton('Return to home screen', 'confirm', lambda: master.switch_frame(HomeScreen)).pack()
-        
