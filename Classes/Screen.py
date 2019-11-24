@@ -6,6 +6,8 @@ from Classes.Question import Question
 from Classes.Sockets import Server
 from Classes.Sockets import Client
 
+from scapy.all import *
+
 # class QuizApp
 class QuizApp(Tk):
     def __init__(self):
@@ -360,14 +362,28 @@ class HostQuizScreen(BaseScreen):
         self.createLabel('Enter your IP:', 'default').pack(side="top", fill="x", pady=5)
 
         self.ip = StringVar()
+
+        # get IP from pc
+        self.ipFromWifi = self.getIpFromPc()
         
-        self.createInput(self.ip, 'default').pack()
+        ipLabel = self.createInput(self.ip, 'default')
+        ipLabel.pack()
+        ipLabel.insert(0, self.ipFromWifi)
 
         self.createLabel('Choose which quiz to host:', 'default').pack(side="top", fill="x", pady=5)
 
         self.showQuizes()
 
         self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x",pady=20)
+
+    def getIpFromPc(self):
+        print('f')
+        # TRY: get IP from pc
+        result = get_windows_if_list()
+        for r in result:
+            if r['name'] == 'WiFi':
+                ipAddress = r['ips'][1]
+        return ipAddress
 
     def showQuizes(self):
         # show all quizes from database
@@ -383,13 +399,14 @@ class HostQuizScreen(BaseScreen):
 
     def next(self, quizId):
         ip = self.ip.get()
+        print(ip)
         server = Server(ip, 5000)
 
         print("this should be our quiz id -> "+str(quizId))
         q = Question()
         questions = q.createQuizWithQuestions(quizId)
         print("this should be a question list -> "+str(questions))
-        
+
         server.setQuestionList(questions)
         self.master.switch_frame(HostQuizWaitingScreen, server)
 

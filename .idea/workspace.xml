@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d1e4dddb-1ee3-4bee-8a56-692bb7e96a81" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Classes/Screen.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Screen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Quiz.db" beforeDir="false" afterPath="$PROJECT_DIR$/Quiz.db" afterDir="false" />
     </list>
     <ignored path=".idea/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -31,17 +31,24 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Classes/Screen.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="443">
-              <caret line="264" column="28" lean-forward="true" selection-start-line="264" selection-start-column="28" selection-end-line="264" selection-end-column="28" />
+            <state relative-caret-position="404">
+              <caret line="371" selection-start-line="371" selection-end-line="371" />
               <folding>
-                <element signature="e#272#1208#0" />
-                <element signature="e#5515#6088#0" />
-                <element signature="e#6139#7009#0" />
-                <element signature="e#7073#8443#0" />
-                <element signature="e#11361#12970#0" />
-                <element signature="e#15438#17413#0" />
-                <element signature="e#17461#18667#0" />
-                <element signature="e#18745#19951#0" />
+                <element signature="e#0#16#0" expanded="true" />
+                <element signature="e#229#1165#0" />
+                <element signature="e#5662#6235#0" />
+                <element signature="e#6286#7156#0" />
+                <element signature="e#7220#8638#0" />
+                <element signature="e#8715#11965#0" />
+                <element signature="e#13731#16040#0" />
+                <element signature="e#16111#18086#0" />
+                <element signature="e#18134#19481#0" />
+                <element signature="e#19559#20785#0" />
+                <element signature="e#20832#22018#0" />
+                <element signature="e#22066#23672#0" />
+                <element signature="e#23727#24708#0" />
+                <element signature="e#24761#25890#0" />
+                <element signature="e#25941#26914#0" />
               </folding>
             </state>
           </provider>
@@ -107,9 +114,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
+    <option name="x" value="1912" />
     <option name="y" value="-8" />
-    <option name="width" value="976" />
+    <option name="width" value="1936" />
     <option name="height" value="1056" />
   </component>
   <component name="ProjectView">
@@ -117,7 +124,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -139,6 +145,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -326,7 +333,11 @@
       <workItem from="1574092531541" duration="114000" />
       <workItem from="1574165297058" duration="10780000" />
       <workItem from="1574268533345" duration="1453000" />
-      <workItem from="1574349425966" duration="2806000" />
+      <workItem from="1574349425966" duration="2862000" />
+      <workItem from="1574430720262" duration="505000" />
+      <workItem from="1574450277712" duration="1101000" />
+      <workItem from="1574473360978" duration="606000" />
+      <workItem from="1574597008596" duration="2148000" />
     </task>
     <task id="LOCAL-00001" summary="Add basic home and quiz screen">
       <created>1570805045185</created>
@@ -339,7 +350,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="99541000" />
+    <option name="totallyTimeSpent" value="103957000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -351,15 +362,15 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="1912" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.496208" visible="true" weight="0.030916844" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.496208" visible="true" weight="0.11886994" />
       <window_info id="Structure" order="1" sideWeight="0.503792" side_tool="true" weight="0.13859275" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.276273" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.2751896" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -387,7 +398,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/PythonQuiz$server.coverage" NAME="server Coverage Results" MODIFIED="1573138166355" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/sockets" />
     <SUITE FILE_PATH="coverage/PythonQuiz$gradient.coverage" NAME="gradient Coverage Results" MODIFIED="1574082888504" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testquiz" />
-    <SUITE FILE_PATH="coverage/PythonQuiz$home.coverage" NAME="home Coverage Results" MODIFIED="1574352222808" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PythonQuiz$home.coverage" NAME="home Coverage Results" MODIFIED="1574599107054" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/PythonQuiz$main.coverage" NAME="main Coverage Results" MODIFIED="1571564186014" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/testquiz" />
     <SUITE FILE_PATH="coverage/PythonQuiz$sockets.coverage" NAME="sockets Coverage Results" MODIFIED="1572947176514" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/sockets" />
     <SUITE FILE_PATH="coverage/PythonQuiz$client.coverage" NAME="client Coverage Results" MODIFIED="1572947844439" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/sockets" />
@@ -465,13 +476,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Classes/Database.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-100">
-          <caret line="5" column="23" lean-forward="true" selection-start-line="5" selection-start-column="23" selection-end-line="5" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Classes/Quiz.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="325">
@@ -542,27 +546,41 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Classes/Question.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="16" column="25" lean-forward="true" selection-start-line="16" selection-start-column="25" selection-end-line="16" selection-end-column="25" />
+        <state relative-caret-position="440">
+          <caret line="22" column="32" lean-forward="true" selection-start-line="22" selection-start-column="32" selection-end-line="22" selection-end-column="32" />
           <folding>
             <element signature="e#17#28#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Classes/Database.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="5" column="23" selection-start-line="5" selection-start-column="23" selection-end-line="5" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Classes/Screen.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="443">
-          <caret line="264" column="28" lean-forward="true" selection-start-line="264" selection-start-column="28" selection-end-line="264" selection-end-column="28" />
+        <state relative-caret-position="404">
+          <caret line="371" selection-start-line="371" selection-end-line="371" />
           <folding>
-            <element signature="e#272#1208#0" />
-            <element signature="e#5515#6088#0" />
-            <element signature="e#6139#7009#0" />
-            <element signature="e#7073#8443#0" />
-            <element signature="e#11361#12970#0" />
-            <element signature="e#15438#17413#0" />
-            <element signature="e#17461#18667#0" />
-            <element signature="e#18745#19951#0" />
+            <element signature="e#0#16#0" expanded="true" />
+            <element signature="e#229#1165#0" />
+            <element signature="e#5662#6235#0" />
+            <element signature="e#6286#7156#0" />
+            <element signature="e#7220#8638#0" />
+            <element signature="e#8715#11965#0" />
+            <element signature="e#13731#16040#0" />
+            <element signature="e#16111#18086#0" />
+            <element signature="e#18134#19481#0" />
+            <element signature="e#19559#20785#0" />
+            <element signature="e#20832#22018#0" />
+            <element signature="e#22066#23672#0" />
+            <element signature="e#23727#24708#0" />
+            <element signature="e#24761#25890#0" />
+            <element signature="e#25941#26914#0" />
           </folding>
         </state>
       </provider>
