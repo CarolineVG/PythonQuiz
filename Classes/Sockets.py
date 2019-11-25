@@ -32,16 +32,32 @@ class Server:
 
     def connectClients(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print("1")
         s.bind((self.ip, self.port))
+        print("2")
         s.listen(5)
+        print("3")
+        s.setblocking(0)
         while True:
-            clientsocket, address = s.accept()
-            if self.access == False:
-                #send back message to client so the client will close connection (I can't figure out how to do it from here)
-                self.sendToClient(clientsocket, '{"type":"connection refused"}')
+            if self.access == True:
+                try:
+                    clientsocket, address = s.accept()
+                    print("5")
+                    if self.access == False:
+                        #send back message to client so the client will close connection (I can't figure out how to do it from here)
+                        #since this part is non-blocking this barely happens anymore
+                        self.sendToClient(clientsocket, '{"type":"connection refused"}')
+                    else:
+                        clientsocket.setblocking(1)
+                        self.clients.add(clientsocket)
+                    print(f"{len(self.clients)} players have connected.")
+                except:
+                    print("checking for connections...")
+                    time.sleep(0.5)
             else:
-                self.clients.add(clientsocket)
-            print(f"{len(self.clients)} players have connected.")
+                s.setblocking(1)
+                print("hosting is stopped")
+                break
     
     def stopHosting(self):
         self.access = False
