@@ -379,9 +379,12 @@ class HostQuizScreen(BaseScreen):
         print('f')
         # TRY: get IP from pc
         result = get_windows_if_list()
+        print(result)
         for r in result:
-            if r['name'] == 'WiFi':
+            if r['name'] == 'WiFi' or r["name"] == "Wi-Fi":
                 ipAddress = r['ips'][1]
+            else:
+                print("wifi wasn't found")
         return ipAddress
 
     def showQuizes(self):
