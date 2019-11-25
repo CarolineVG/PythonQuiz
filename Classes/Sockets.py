@@ -45,7 +45,7 @@ class Server:
                     print("5")
                     if self.access == False:
                         #send back message to client so the client will close connection (I can't figure out how to do it from here)
-                        #since this part is non-blocking this barely happens anymore
+                        #since this part was edited to be non-blocking this barely happens anymore
                         self.sendToClient(clientsocket, '{"type":"connection refused"}')
                     else:
                         clientsocket.setblocking(1)
