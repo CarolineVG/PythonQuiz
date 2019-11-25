@@ -69,19 +69,28 @@ class Question:
         questionsDictionary = []
 
         i = 0
+
+
         for i in range(len(records)):
-            #print(f'records: {records}')
             q = records[i]
+
+            # options
+            options = {}
+
+            if q[4] != None:
+                options["option1"] = q[4]
+            if q[5] != None:
+                options["option2"] = q[5]
+            if q[6] != None:
+                options["option3"] = q[6]
+            if q[7] != None:
+                options["option4"] = q[7]
+
             question = {
                 "id": str(q[0]),
                 "question": q[2],
                 "solution": q[3],
-                "options": {
-                    "option1": q[4],
-                    "option2": q[5],
-                    "option3": q[6],
-                    "option4": q[7]
-                },
+                "options": options,
                 "time": q[8],
                 "points": str(q[9]),
                 "score": str(10)

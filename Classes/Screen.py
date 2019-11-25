@@ -186,6 +186,7 @@ class HomeScreen(BaseScreen):
         self.createLabel('Home', 'title').pack(side="top",fill="x",pady=30)
 
         self.createButton('Create Quiz', 'default', lambda: master.switch_frame(CreateQuizScreen)).pack(side="top", fill="x", pady=20)
+        self.createButton('Manage Quizes', 'default', lambda: master.switch_frame(ManageQuizesScreen)).pack(side="top",fill="x",pady=20)
         self.createButton('Host Quiz', 'default', lambda: master.switch_frame(HostQuizScreen, 'a')).pack(side="top",fill="x",pady=20)
         self.createButton('Play Quiz', 'default', lambda: master.switch_frame(JoinQuizScreen)).pack(side="top",fill="x",pady=20)
 
@@ -339,6 +340,51 @@ class CreateQuestionScreen(BaseScreen):
 
         # change finish button from disabled to active
         self.finishQuizButton.config(state="normal")
+
+
+# screen MANAGE QUIZES
+class ManageQuizesScreen(BaseScreen):
+    # master = self from QuizApp
+    def __init__(self, master, *args):
+
+        # extend from BaseScreen
+        BaseScreen.__init__(self, master)
+        self.master = master
+
+        if args:
+            self.getArguments(*args)
+
+        # layout
+        self.configure(bg=self.setBackgroundColor())
+
+        self.createLabel('Manage Quizes', 'title').pack(side="top", fill="x", pady=30)
+
+        self.showQuizes()
+
+        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x", pady=20)
+
+    def showQuizes(self):
+        # show all quizes from database
+        print('show quizes from database')
+
+        q = Quiz()
+        quizes = q.getDataFromDatabase()
+        print(f'db: {quizes}')
+
+        for item in quizes:
+            quizId = item[0]
+            self.createLabel(item[1], 'heading1').pack(side="top", fill="x", pady=30)
+            self.createButton('Delete', 'return', lambda quizId=quizId: self.deleteQuiz(quizId)).pack(side="top", fill="x",
+                                                                                                pady=20)
+
+    def deleteQuiz(self, quizId):
+        # delete quiz to do
+        print('delete')
+
+        # db delete: quiz
+
+
+        # db delete: question
 
 
 # screen HOST QUIZ
