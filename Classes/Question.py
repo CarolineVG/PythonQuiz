@@ -103,3 +103,14 @@ class Question:
 
         print(f'Quiz: {questionsDictionary}')
         return questionsDictionary
+
+    def deleteQuestion(self, val):
+        print('delete')
+        id = val
+        print(id)
+        db = Database()
+        conn = db.getConnection()
+        cursor = conn.cursor()
+
+        cursor.execute('DELETE FROM Questions WHERE QuizId = ?', (id,))
+        conn.commit()
