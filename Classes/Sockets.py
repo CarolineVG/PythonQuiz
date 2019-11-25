@@ -32,17 +32,13 @@ class Server:
 
     def connectClients(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print("1")
         s.bind((self.ip, self.port))
-        print("2")
         s.listen(5)
-        print("3")
         s.setblocking(0)
         while True:
             if self.access == True:
                 try:
                     clientsocket, address = s.accept()
-                    print("5")
                     if self.access == False:
                         #send back message to client so the client will close connection (I can't figure out how to do it from here)
                         #since this part was edited to be non-blocking this barely happens anymore
