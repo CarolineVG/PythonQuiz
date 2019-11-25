@@ -259,6 +259,8 @@ class CreateQuestionScreen(BaseScreen):
         self.answer3Value = StringVar()
         self.answer4Value = StringVar()
         self.solutionValue = StringVar()
+        self.timerValue = StringVar()
+        self.pointsValue = StringVar()
 
         # layout
         self.configure(bg=self.setBackgroundColor())
@@ -293,6 +295,14 @@ class CreateQuestionScreen(BaseScreen):
         r3 = Radiobutton(self, text='3', variable=self.solutionValue, value='option3').pack()
         r4 = Radiobutton(self, text='4', variable=self.solutionValue, value='option4').pack()
 
+        self.createLabel('Timer', 'default').pack()
+        self.timerInput = self.createInput(self.timerValue, 'default')
+        self.timerInput.pack()
+
+        self.createLabel('Points', 'default').pack()
+        self.pointsInput = self.createInput(self.pointsValue, 'default')
+        self.pointsInput.pack()
+
         self.saveQuestionButton = self.createButton('Save Question', 'confirm', lambda: self.addQuestion())
         self.saveQuestionButton.pack(side="top", fill="x",pady=10)
 
@@ -309,10 +319,12 @@ class CreateQuestionScreen(BaseScreen):
         a3 = self.answer3Value.get()
         a4 = self.answer4Value.get()
         s = self.solutionValue.get()
+        t = self.timerValue.get()
+        p = self.pointsValue.get()
 
         # create new Question:
         newQuestion = Question()
-        newQuestion.addQuestion(self.quizId, q, s, a1, a2, a3, a4, 60, 10)
+        newQuestion.addQuestion(self.quizId, q, s, a1, a2, a3, a4, int(t), int(p))
         newQuestion.addQuestionToDatabase()
         newQuestion.getQuestionFromDatabase()
 
@@ -322,6 +334,8 @@ class CreateQuestionScreen(BaseScreen):
         self.answer2Value.set("")
         self.answer3Value.set("")
         self.answer4Value.set("")
+        self.timerValue.set("")
+        self.pointsValue.set("")
 
         # change finish button from disabled to active
         self.finishQuizButton.config(state="normal")
@@ -765,7 +779,7 @@ class JoinQuizScoreScreen(BaseScreen):
 
         self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
 
-        title = self.createLabel('Scoreboard:', 'heading')
+        title = self.createLabel('Scoreboard:', 'heading1')
         title.pack(side="top", fill="x", pady=5)
 
         for player in scores:
@@ -807,10 +821,13 @@ class JoinQuizEndScreen(BaseScreen):
             self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
             self.createLabel('You won! Congratulations!', 'heading1').pack(side="top", fill="x", pady=5)
         else:
+            self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
             self.createLabel(f'{scores[0][0]} won!', 'heading1').pack(side="top", fill="x", pady=5)
         if (len(scores) >= 2) and (scores[1][0] == self.client.name):
+            self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
             self.createLabel('You came in second!', 'default').pack()
         if (len(scores) >= 3) and (scores[2][0] == self.client.name):
+            self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
             self.createLabel('You came in third!', 'default').pack()
         self.client.end()
         self.createButton('Return to home screen', 'confirm', lambda: master.switch_frame(HomeScreen)).pack()

@@ -35,7 +35,7 @@ class Question:
 
         # insert one value: var should be a tuple
         conn.execute('INSERT INTO Questions(QuizId, Question, Solution, Answer1, Answer2, Answer3, Answer4, Timer, Points) VALUES'
-                     '(?,?,?,?,?,?,?,?,?)', (self.quizId, self.question, self.solution, self.answer1, self.answer2, self.answer3, self.answer4, 60, 10))
+                     '(?,?,?,?,?,?,?,?,?)', (self.quizId, self.question, self.solution, self.answer1, self.answer2, self.answer3, self.answer4, self.timer, self.points))
         conn.commit()
 
     def getQuestionFromDatabase(self):
