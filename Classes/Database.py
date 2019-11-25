@@ -19,21 +19,3 @@ class Database:
 
     def closeConnection(self):
         self.conn.close()
-
-    # # get data
-    # def getData(self):
-    #     self.cursor.execute('SELECT * FROM Questions')
-    #     records = self.cursor.fetchall()
-    #     print(f'data from db: {records}')
-    #     self.conn.commit()
-    #
-    # # insert data
-    # def insertData(self, quizId, question, solution, answer1, answer2, answer3, answer4):
-    #     self.conn.execute('INSERT INTO Questions(QuizId, Question, Solution, Answer1, Answer2, Answer3, Answer4) VALUES(?,?,?,?,?,?,?,?,?)', (quizId, question, solution, answer1, answer2, answer3, answer4, 60, 10))
-    #     self.conn.commit()
-    #
-    #     # this does work!
-    #     self.cursor.execute('SELECT * FROM Questions')
-    #     records = self.cursor.fetchall()
-    #     print(f'after db - {records}')
-    #
