@@ -165,10 +165,11 @@ class Server:
                 
 
     def sendScores(self):
+        solution = self.questionList[self.currentQuestion-1]["options"][self.questionList[self.currentQuestion-1]["solution"]]
         if self.lastQuestion():
-            scoreboard = '{"type":"scores", "scoreboard":'+json.dumps(self.scores)+',"endMessage":"Thank you for playing!"}'
+            scoreboard = '{"type":"scores", "solution":"'+solution+'", "scoreboard":'+json.dumps(self.scores)+',"endMessage":"Thank you for playing!"}'
         else:
-            scoreboard = '{"type":"scores", "scoreboard":'+json.dumps(self.scores)+'}'
+            scoreboard = '{"type":"scores", "solution":"'+solution+'", "scoreboard":'+json.dumps(self.scores)+'}'
         self.sendToAll(scoreboard)
 
     def waitAndSendScores(self):
@@ -237,6 +238,7 @@ class Client:
         self.newScores = None
         self.ended = False
         self.endMessage = None
+        self.solution = None
     
     def join(self):
         try:
@@ -289,6 +291,7 @@ class Client:
                     break
                 if message["type"] == "scores":
                     self.newScores = message["scoreboard"]
+                    self.solution = message["solution"]
                     break
                 if message["type"] == "end":
                     self.ended = True
@@ -355,6 +358,13 @@ class Client:
     def getYourScore(self):
         if self.newScores != None:
             return self.newScores.get(self.name)
+        else:
+            print("No scores have been send")
+            return None
+
+    def getSolution(self):
+        if self.newScores != None:
+            return self.solution
         else:
             print("No scores have been send")
             return None

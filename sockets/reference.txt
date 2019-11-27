@@ -112,6 +112,9 @@ client.getYourScore()
 #get sorted list of all scores:
 client.getScores()
 
+# get the solution to the last question that was send (is available when the scores are send)
+client.getSolution()
+
 # check if the server has ended the quiz. False or True
 client.ended
 

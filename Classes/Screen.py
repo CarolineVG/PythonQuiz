@@ -873,8 +873,11 @@ class JoinQuizScoreScreen(BaseScreen):
 
         self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
 
-        title = self.createLabel('Scoreboard:', 'heading1')
-        title.pack(side="top", fill="x", pady=5)
+        self.createLabel('The answer was:', 'heading1').pack(side="top", fill="x", pady=5)
+        answer = self.client.getSolution()
+        self.createLabel(answer, 'default').pack(side="top", fill="x", pady=5)
+
+        self.createLabel('Scoreboard:', 'heading1').pack(side="top", fill="x", pady=5)
 
         for player in scores:
             self.createLabel(str(player[0])+" - "+str(player[1]), 'default').pack(side="top", fill="x", pady=5)
