@@ -532,16 +532,22 @@ class HostQuizWaitingScreen(BaseScreen):
         else:
             self.cancel = True
 
-    def updateInterface(self):
-        amountOfPlayers = len(self.server.clients)
-        
+    def updateInterface(self):        
         while True:
             if self.start:
                 self.server.stopHosting()
                 server = self.server
-                self.continueButton.config(text='Start Quiz', command=lambda: self.master.switch_frame(HostQuizScoreScreen, self.server, 0))
-                self.waitingLabel.config(text = "Ready to begin")
-                break
+                # if there are no players, the quiz can't begin
+                if len(self.server.clients) < 1:
+                    self.waitingLabel.config(text = "No players were found!")
+                    self.playersLabel.config(text="You need to find players to start the quiz...")
+                    self.server.endQuiz()
+                    self.continueButton.destroy()
+                    break
+                else:
+                    self.continueButton.config(text='Start Quiz', command=lambda: self.master.switch_frame(HostQuizScoreScreen, self.server, 0))
+                    self.waitingLabel.config(text = "Ready to begin")
+                    break
             elif self.cancel:
                 self.server.stopHosting()
                 self.server.endQuiz()
