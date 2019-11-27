@@ -503,6 +503,7 @@ class HostQuizWaitingScreen(BaseScreen):
         # var server
         self.server = self.args[0]
         self.start = False
+        self.cancel = False
 
         self.startServer()
         
@@ -520,13 +521,16 @@ class HostQuizWaitingScreen(BaseScreen):
         self.continueButton = self.createButton('Enough players', 'confirm', lambda: self.stopThread())
         self.continueButton.pack()
         
-        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x",pady=20)
-
-        #IMPORTANT: when we return, we probably have to shut down the server instance so it can be started again on the previous screen
-        #I don't know how to do this
-        #halp
+        self.createButton('cancel', 'return', self.cancelQuiz).pack(side="top", fill="x",pady=20)
         
         x = threading.Thread(target=self.updateInterface).start()
+
+    def cancelQuiz(self):
+        if self.start:
+            self.server.endQuiz()
+            self.master.switch_frame(HomeScreen)
+        else:
+            self.cancel = True
 
     def updateInterface(self):
         amountOfPlayers = len(self.server.clients)
@@ -538,18 +542,14 @@ class HostQuizWaitingScreen(BaseScreen):
                 self.continueButton.config(text='Start Quiz', command=lambda: self.master.switch_frame(HostQuizScoreScreen, self.server, 0))
                 self.waitingLabel.config(text = "Ready to begin")
                 break
+            elif self.cancel:
+                self.server.stopHosting()
+                self.server.endQuiz()
+                self.master.switch_frame(HomeScreen)
+                break
             else:
                 self.playersLabel.config(text = f"{str(len(self.server.clients))} players are connected")
     
-    def startServer(self):
-        print("start server")
-        self.server.host()
-
-    def stopThread(self):
-        # stop thread:
-        print("stop thread")
-        self.start = True
-
     def startServer(self):
         print("start server")
         self.server.host()
@@ -727,7 +727,6 @@ class JoinQuizConnectScreen(BaseScreen):
 
         connectingLabel = self.createLabel('Connecting to host', 'default')
         connectingLabel.pack()
-
         if self.client.join():
             connectingLabel.config(text="Connected!")
             x = threading.Thread(target=self.receiveQuestion).start()
@@ -736,12 +735,33 @@ class JoinQuizConnectScreen(BaseScreen):
             self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack()
 
     def receiveQuestion(self):
-        self.createLabel('Waiting for the Quiz master to send the first Question', 'default').pack()
+        self.createLabel('Waiting for the quiz master to send the first question', 'default').pack()
         self.client.listen()
         print("done listening")
+        if self.client.ended:
+            self.master.switch_frame(JoinQuizDisconnectScreen, self.client)
         if self.client.getQuestion() != None:
             self.master.switch_frame(JoinQuizQuestionScreen, self.client)
 
+class JoinQuizDisconnectScreen(BaseScreen):
+    # master = self from QuizApp
+    def __init__(self, master, *args):
+
+        # extend from BaseScreen
+        BaseScreen.__init__(self, master)
+
+        if args:
+            self.getArguments(*args)
+
+        self.client = self.args[0]
+
+        self.client.end()
+
+        #layout
+        self.configure(bg=self.setBackgroundColor())
+        self.createLabel('Disconnected', 'title').pack(side="top", fill="x", pady=30)
+        self.createLabel('The host has canceled the quiz.', 'default').pack()
+        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top",pady=30)
 
 # screen JOIN QUIZ QUESTION
 class JoinQuizQuestionScreen(BaseScreen):
