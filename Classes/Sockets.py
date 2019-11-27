@@ -51,6 +51,7 @@ class Server:
                     print("checking for connections...")
                     time.sleep(0.5)
             else:
+                s.setblocking(1)
                 print("hosting is stopped")
                 break
     
@@ -62,6 +63,7 @@ class Server:
             self.ready = True
         else:
             print("No players were found.")
+            sys.exit(0)
 
     def sendToClient(self, client, json):
         message = pickle.dumps(json)

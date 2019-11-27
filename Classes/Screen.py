@@ -14,14 +14,13 @@ class QuizApp(Tk):
         Tk.__init__(self)
         self._frame = None
         self.switch_frame(HomeScreen)
-        self.geometry("600x800")
         self.configure(bg='#FE715B')
 
         # check size of screen
-        #height = self.winfo_screenheight()
-        #width = self.winfo_screenwidth()
-        #pixels = str(width - 10) + 'x' + str(height)
-        #self.geometry(pixels)
+        height = self.winfo_screenheight()
+        width = self.winfo_screenwidth()
+        pixels = str(width - 10) + 'x' + str(height)
+        self.geometry(pixels)
 
     # switch screens
     def switch_frame(self, frame_class, *args):
@@ -168,6 +167,11 @@ class BaseScreen(Frame):
 
         return inputfield
 
+    def createRadioButton(self, text, variable, value):
+        radio = Radiobutton(self, text=text, variable=variable, value=value, fg = self.labelForeColor, bg = self.labelBackColor,
+                            activeforeground=self.labelForeColor, activebackground=self.labelBackColor, font=(self.fontFamily, self.labelFontSize, self.labelFontType))
+
+        return radio
 
 # screen HOME
 class HomeScreen(BaseScreen):
@@ -186,6 +190,7 @@ class HomeScreen(BaseScreen):
         self.createLabel('Home', 'title').pack(side="top",fill="x",pady=30)
 
         self.createButton('Create Quiz', 'default', lambda: master.switch_frame(CreateQuizScreen)).pack(side="top", fill="x", pady=20)
+        self.createButton('Manage Quizes', 'default', lambda: master.switch_frame(ManageQuizesScreen)).pack(side="top",fill="x",pady=20)
         self.createButton('Host Quiz', 'default', lambda: master.switch_frame(HostQuizScreen, 'a')).pack(side="top",fill="x",pady=20)
         self.createButton('Play Quiz', 'default', lambda: master.switch_frame(JoinQuizScreen)).pack(side="top",fill="x",pady=20)
 
@@ -208,7 +213,7 @@ class CreateQuizScreen(BaseScreen):
 
         self.createLabel('Quiz', 'title').pack(side="top", fill="x", pady=30)
 
-        self.createLabel('Quiz Name*', 'default').pack(side="top", fill="x", pady=30)
+        self.createLabel('Quiz Name', 'default').pack(side="top", fill="x", pady=30)
         self.createInput(self.quizValue, 'default').pack()
 
         self.saveButton = self.createButton('Save', 'confirm', lambda: self.saveQuiz())
@@ -217,24 +222,33 @@ class CreateQuizScreen(BaseScreen):
         self.returnButton = self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen))
         self.returnButton.pack(side="top",fill="x",pady=10)
 
+        self.errorLabel = self.createLabel('', 'default')
+        self.errorLabel.pack(side="top", fill="x", pady=30)
+
     def saveQuiz(self):
+        # validation
         q = self.quizValue.get()
+        if len(q) == 0 or q == None:
+            print('empty')
+            self.errorLabel.config(text='Please enter a quiz name')
+        else:
+            self.errorLabel.config(text='')
 
-        # create new Quiz
-        newQuiz = Quiz()
-        newQuiz.setQuizName(q)
-        newQuiz.addQuizToDatabase()
+            # create new Quiz
+            newQuiz = Quiz()
+            newQuiz.setQuizName(q)
+            newQuiz.addQuizToDatabase()
 
-        # get id from new quiz
-        result = newQuiz.getIdFromQuizName(q)
+            # get id from new quiz
+            result = newQuiz.getIdFromQuizName(q)
 
-        createQuizId = result[0]
-        print(createQuizId)
+            createQuizId = result[0]
+            print(createQuizId)
 
-        # change button
-        self.saveButton.config(text='Add Questions',command=lambda: self.master.switch_frame(CreateQuestionScreen, createQuizId))
-        # disable return button (you can't make an empty quiz)
-        self.returnButton.destroy()
+            # change button
+            self.saveButton.config(text='Add Questions',command=lambda: self.master.switch_frame(CreateQuestionScreen, createQuizId))
+            # disable return button (you can't make an empty quiz)
+            self.returnButton.destroy()
 
 
 # screen CREATE QUESTION QUIZ
@@ -250,8 +264,6 @@ class CreateQuestionScreen(BaseScreen):
 
         arg = args[0]
         self.quizId = arg[0]
-        print(self.quizId)
-
 
         self.questionValue = StringVar()
         self.answer1Value = StringVar()
@@ -265,18 +277,17 @@ class CreateQuestionScreen(BaseScreen):
         # layout
         self.configure(bg=self.setBackgroundColor())
 
-        self.createLabel('Quiz', 'title').pack(side="top", fill="x", pady=30)
+        self.createLabel('Quiz*', 'title').pack(side="top", fill="x", pady=30)
 
-        self.createLabel('Question', 'default').pack()
+        self.createLabel('Question*', 'default').pack()
         self.questionInput = self.createInput(self.questionValue, 'default')
         self.questionInput.pack()
 
-
-        self.createLabel('Answer 1', 'default').pack()
+        self.createLabel('Answer 1*', 'default').pack()
         self.answer1Input = self.createInput(self.answer1Value, 'default')
         self.answer1Input.pack()
 
-        self.createLabel('Answer 2', 'default').pack()
+        self.createLabel('Answer 2*', 'default').pack()
         self.answer2Input = self.createInput(self.answer2Value, 'default')
         self.answer2Input.pack()
 
@@ -288,18 +299,17 @@ class CreateQuestionScreen(BaseScreen):
         self.answer4Input = self.createInput(self.answer4Value, 'default')
         self.answer4Input.pack()
 
-        # TO DO: LAYOUT
-        solutionLabel = Label(self, text='Correct answer', fg='black', font=('arial', 16, 'bold')).pack()
-        r1 = Radiobutton(self, text='1', variable=self.solutionValue, value='option1').pack()
-        r2 = Radiobutton(self, text='2', variable=self.solutionValue, value='option2').pack()
-        r3 = Radiobutton(self, text='3', variable=self.solutionValue, value='option3').pack()
-        r4 = Radiobutton(self, text='4', variable=self.solutionValue, value='option4').pack()
+        self.createLabel('Correct Answer*', 'default').pack()
+        self.createRadioButton('1', self.solutionValue, 'option1').pack()
+        self.createRadioButton('2', self.solutionValue, 'option2').pack()
+        self.createRadioButton('3', self.solutionValue, 'option3').pack()
+        self.createRadioButton('4', self.solutionValue, 'option4').pack()
 
-        self.createLabel('Timer', 'default').pack()
+        self.createLabel('Timer*', 'default').pack()
         self.timerInput = self.createInput(self.timerValue, 'default')
         self.timerInput.pack()
 
-        self.createLabel('Points', 'default').pack()
+        self.createLabel('Points*', 'default').pack()
         self.pointsInput = self.createInput(self.pointsValue, 'default')
         self.pointsInput.pack()
 
@@ -308,6 +318,9 @@ class CreateQuestionScreen(BaseScreen):
 
         self.finishQuizButton = self.createButton('Finish Quiz', 'confirm', lambda: master.switch_frame(HostQuizScreen), 'disabled')
         self.finishQuizButton.pack(side="top", fill="x",pady=10)
+
+        self.errorLabel = self.createLabel('', 'default')
+        self.errorLabel.pack(side="top", fill="x", pady=30)
 
     def addQuestion(self):
         # create new Quiz
@@ -322,23 +335,85 @@ class CreateQuestionScreen(BaseScreen):
         t = self.timerValue.get()
         p = self.pointsValue.get()
 
-        # create new Question:
-        newQuestion = Question()
-        newQuestion.addQuestion(self.quizId, q, s, a1, a2, a3, a4, int(t), int(p))
-        newQuestion.addQuestionToDatabase()
-        newQuestion.getQuestionFromDatabase()
+        # validation
+        values = [q, a1, a2, s, t, p]
+        emptyFields = False
+        for v in values:
+            if len(v) == 0 or v is None:
+                print('empty')
+                self.errorLabel.config(text='Please enter required fields')
+                emptyFields = True
 
-        # empty everything for new question
-        self.questionValue.set("")
-        self.answer1Value.set("")
-        self.answer2Value.set("")
-        self.answer3Value.set("")
-        self.answer4Value.set("")
-        self.timerValue.set("")
-        self.pointsValue.set("")
+        if emptyFields == False:
+            self.errorLabel.config(text='')
 
-        # change finish button from disabled to active
-        self.finishQuizButton.config(state="normal")
+            # create new Question:
+            newQuestion = Question()
+            newQuestion.addQuestion(self.quizId, q, s, a1, a2, a3, a4, int(t), int(p))
+            newQuestion.addQuestionToDatabase()
+            newQuestion.getQuestionFromDatabase()
+
+            # empty everything for new question
+            self.questionValue.set("")
+            self.answer1Value.set("")
+            self.answer2Value.set("")
+            self.answer3Value.set("")
+            self.answer4Value.set("")
+            self.timerValue.set("")
+            self.pointsValue.set("")
+
+            # change finish button from disabled to active
+            self.finishQuizButton.config(state="normal")
+
+
+# screen MANAGE QUIZES
+class ManageQuizesScreen(BaseScreen):
+    # master = self from QuizApp
+    def __init__(self, master, *args):
+
+        # extend from BaseScreen
+        BaseScreen.__init__(self, master)
+        self.master = master
+
+        if args:
+            self.getArguments(*args)
+
+        # layout
+        self.configure(bg=self.setBackgroundColor())
+
+        self.createLabel('Manage Quizes', 'title').pack(side="top", fill="x", pady=30)
+
+        self.showQuizes()
+
+        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x", pady=20)
+
+    def showQuizes(self):
+        # show all quizes from database
+        print('show quizes from database')
+
+        q = Quiz()
+        quizes = q.getDataFromDatabase()
+        print(f'db: {quizes}')
+
+        for item in quizes:
+            quizId = item[0]
+            self.createLabel(item[1], 'heading1').pack()
+            self.createButton('Delete', 'return', lambda quizId=quizId: self.deleteQuiz(quizId)).pack(side="top", fill="x",
+                                                                                                pady=5)
+
+    def deleteQuiz(self, quizId):
+        # delete quiz to do
+
+        # db delete: quiz
+        quiz = Quiz()
+        quiz.deleteQuiz(quizId)
+
+        # db delete: question
+        question = Question()
+        question.deleteQuestion(quizId)
+
+        # refresh screen
+        self.master.switch_frame(ManageQuizesScreen)
 
 
 # screen HOST QUIZ
@@ -428,7 +503,6 @@ class HostQuizWaitingScreen(BaseScreen):
         # var server
         self.server = self.args[0]
         self.start = False
-        self.cancel = False
 
         self.startServer()
         
@@ -446,7 +520,7 @@ class HostQuizWaitingScreen(BaseScreen):
         self.continueButton = self.createButton('Enough players', 'confirm', lambda: self.stopThread())
         self.continueButton.pack()
         
-        self.createButton('cancel', 'return', self.cancelQuiz).pack(side="top", fill="x",pady=20)
+        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x",pady=20)
 
         #IMPORTANT: when we return, we probably have to shut down the server instance so it can be started again on the previous screen
         #I don't know how to do this
@@ -454,26 +528,15 @@ class HostQuizWaitingScreen(BaseScreen):
         
         x = threading.Thread(target=self.updateInterface).start()
 
-    def cancelQuiz(self):
-        print("cancelQuiz")
-        if self.start:
-            self.server.endQuiz()
-            self.master.switch_frame(HomeScreen)
-        else:
-            self.cancel = True
-
-    def updateInterface(self):        
+    def updateInterface(self):
+        amountOfPlayers = len(self.server.clients)
+        
         while True:
             if self.start:
                 self.server.stopHosting()
                 server = self.server
                 self.continueButton.config(text='Start Quiz', command=lambda: self.master.switch_frame(HostQuizScoreScreen, self.server, 0))
                 self.waitingLabel.config(text = "Ready to begin")
-                break
-            elif self.cancel:
-                self.server.stopHosting()
-                self.server.endQuiz()
-                self.master.switch_frame(HomeScreen)
                 break
             else:
                 self.playersLabel.config(text = f"{str(len(self.server.clients))} players are connected")
@@ -490,6 +553,11 @@ class HostQuizWaitingScreen(BaseScreen):
     def startServer(self):
         print("start server")
         self.server.host()
+
+    def stopThread(self):
+        # stop thread:
+        print("stop thread")
+        self.start = True
 
 
 # screen HOST QUIZ START
@@ -668,34 +736,12 @@ class JoinQuizConnectScreen(BaseScreen):
             self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack()
 
     def receiveQuestion(self):
-        self.createLabel('Waiting for the Quiz master to send the first question', 'default').pack()
+        self.createLabel('Waiting for the Quiz master to send the first Question', 'default').pack()
         self.client.listen()
         print("done listening")
-        if self.client.ended:
-            self.master.switch_frame(JoinQuizDisconnectScreen, self.client)
         if self.client.getQuestion() != None:
             self.master.switch_frame(JoinQuizQuestionScreen, self.client)
 
-class JoinQuizDisconnectScreen(BaseScreen):
-    # master = self from QuizApp
-    def __init__(self, master, *args):
-
-        # extend from BaseScreen
-        BaseScreen.__init__(self, master)
-
-        if args:
-            self.getArguments(*args)
-
-        self.client = self.args[0]
-
-        self.client.end()
-
-        #layout
-        self.configure(bg=self.setBackgroundColor())
-        self.createLabel('Disconnected', 'title').pack(side="top", fill="x", pady=30)
-        self.createLabel('The host has canceled the quiz.', 'default').pack()
-        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top",pady=30)
-        
 
 # screen JOIN QUIZ QUESTION
 class JoinQuizQuestionScreen(BaseScreen):
