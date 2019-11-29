@@ -37,6 +37,7 @@ class Question:
         conn.execute('INSERT INTO Questions(QuizId, Question, Solution, Answer1, Answer2, Answer3, Answer4, Timer, Points) VALUES'
                      '(?,?,?,?,?,?,?,?,?)', (self.quizId, self.question, self.solution, self.answer1, self.answer2, self.answer3, self.answer4, self.timer, self.points))
         conn.commit()
+        db.closeConnection()
 
     def getQuestionFromDatabase(self):
         db = Database()
@@ -61,15 +62,9 @@ class Question:
         cursor.execute('SELECT * FROM Questions WHERE QuizId = ?', (quizId,))
         records = cursor.fetchall()
         print(f'questions {quizId} - {records}')
-
-        # question = '{"type":"question", "sender": "Host", "id":"' + question['Id'] + '", "question": "' + json.dumps(question['Question']) + '}'
-
-        # + '", "options":' + json.dumps(answers) + ',"time":' + question['Timer'] + question['Points'] + '}'
-
         questionsDictionary = []
 
         i = 0
-
 
         for i in range(len(records)):
             q = records[i]
@@ -102,6 +97,7 @@ class Question:
             i = i+1
 
         print(f'Quiz: {questionsDictionary}')
+        db.closeConnection()
         return questionsDictionary
 
     def deleteQuestion(self, val):
@@ -114,3 +110,4 @@ class Question:
 
         cursor.execute('DELETE FROM Questions WHERE QuizId = ?', (id,))
         conn.commit()
+        db.closeConnection()
