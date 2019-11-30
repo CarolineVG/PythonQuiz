@@ -521,7 +521,7 @@ class HostQuizWaitingScreen(BaseScreen):
         self.continueButton = self.createButton('Enough players', 'confirm', lambda: self.stopThread())
         self.continueButton.pack()
         
-        self.createButton('cancel', 'return', self.cancelQuiz).pack(side="top", fill="x",pady=20)
+        self.createButton('Cancel', 'return', self.cancelQuiz).pack(side="top", fill="x",pady=20)
         
         x = threading.Thread(target=self.updateInterface).start()
 

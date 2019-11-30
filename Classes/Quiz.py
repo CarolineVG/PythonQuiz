@@ -18,6 +18,7 @@ class Quiz:
         conn.execute('INSERT INTO Quizes(QuizName) VALUES(?)', (self.quizName,))
 
         conn.commit()
+        db.closeConnection()
 
     def setQuizName(self, value):
         self.quizName = value
@@ -45,6 +46,8 @@ class Quiz:
         cursor.execute('SELECT Id FROM Quizes WHERE QuizName = ?', (quizName,))
         records = cursor.fetchone()
 
+        db.closeConnection()
+
         return records
 
     def deleteQuiz(self, val):
@@ -57,3 +60,4 @@ class Quiz:
 
         cursor.execute('DELETE FROM Quizes WHERE Id = ?', (id,))
         conn.commit()
+        db.closeConnection()
