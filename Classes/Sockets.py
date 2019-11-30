@@ -66,7 +66,13 @@ class Server:
     def sendToClient(self, client, json):
         message = pickle.dumps(json)
         message = bytes(f'{len(message):<{self.headerSize}}', "utf-8") + message
-        client.send(message)
+        try:
+            client.send(message)
+        except:
+            print("a client has disconnected (scenario 1)")
+            client.close()
+            self.clients.remove(client)
+            print("len in Sockets.py scenario 1 = "+str(len(self.clients)))
 
     def sendToAll(self, json):
         for c in self.clients:
@@ -111,26 +117,35 @@ class Server:
         fullAnswer = b''
         newAnswer = True
         while True:
-            response = client.recv(8)
-            if newAnswer:
-                answerLength = int(response[:self.headerSize])
-                newAnswer = False
+            try:
+                response = client.recv(8)
+                if newAnswer:
+                    answerLength = int(response[:self.headerSize])
+                    newAnswer = False
 
-            fullAnswer += response
-            if len(fullAnswer)-self.headerSize == answerLength:
-                answer = pickle.loads(fullAnswer[self.headerSize:])
-                answer = json.loads(answer)
-                
-                self.answers = self.answers + 1
-
-                self.updateScores(answer["sender"], answer["answer"], solution, answer["score"])
-                
-                if self.everyoneAnswered():
-                    #all players have answered.
+                fullAnswer += response
+                if len(fullAnswer)-self.headerSize == answerLength:
+                    answer = pickle.loads(fullAnswer[self.headerSize:])
+                    answer = json.loads(answer)
                     
-                    print(f"All players answered question {self.currentQuestion+1}")
+                    self.answers = self.answers + 1
 
+                    self.updateScores(answer["sender"], answer["answer"], solution, answer["score"])
                     
+                    if self.everyoneAnswered():
+                        #all players have answered.
+                        self.answers = 0
+                        self.currentQuestion = self.currentQuestion + 1
+                        self.ready = True
+                    return
+            except:
+                print("a client has disconnected (scenario 2)")
+                #remove this player from the list.
+                client.close()
+                self.clients.remove(client)
+                #check if everyone has answered
+                print("len in Sockets.py scenario 2 = "+str(len(self.clients)))
+                if len(self.clients) > 0 and self.everyoneAnswered():
                     self.answers = 0
                     self.currentQuestion = self.currentQuestion + 1
                     self.ready = True
@@ -162,7 +177,6 @@ class Server:
         while True:
             if self.ready:
                 return sortScores(self.scores)
-                
 
     def sendScores(self):
         solution = self.questionList[self.currentQuestion-1]["options"][self.questionList[self.currentQuestion-1]["solution"]]
@@ -212,10 +226,12 @@ class Server:
 
     def setEndMessage(self, string):
         self.endMessage = string
+
+    def getCurrentTimer(self):
+        return self.questionList[self.currentQuestion]["time"]
         
     def endQuiz(self): #send an end message to the other programs. They then do whatever they want with it.
         message = '{"type":"end", "scoreboard":'+json.dumps(self.scores)+', "endMessage":"'+self.endMessage+'"}'
-        print(message)
         self.sendToAll(message)
         for c in self.clients:
             print(str(c))

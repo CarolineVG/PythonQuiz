@@ -56,6 +56,9 @@ server.lastQuestion()
 # set the end message that will be send to clients when the quiz is ended
 server.setEndMessage()
 
+#returns the timer of the current question
+server.getCurrentTimer()
+
 # end the quiz. Sends end message and final scores to the clients before closing the connection
 server.endQuiz()
 

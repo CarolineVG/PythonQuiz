@@ -583,7 +583,7 @@ class HostQuizScoreScreen(BaseScreen):
         self.configure(bg=self.setBackgroundColor())
 
         self.createLabel('Host Quiz', 'title').pack(side="top", fill="x", pady=30)
-
+        
         if self.args[1] == 0:
             # first question
             position = self.args[1]
@@ -629,8 +629,6 @@ class HostQuizQuestionScreen(BaseScreen):
     # master = self from QuizApp
     def __init__(self, master, *args):
 
-        print("in HostQuizQuestionScreen constructor")
-
         # extend from BaseScreen
         BaseScreen.__init__(self, master)
         self.master = master
@@ -656,19 +654,53 @@ class HostQuizQuestionScreen(BaseScreen):
         # show answers
         for item in self.server.questionList[self.position]["options"]:
             self.createLabel('- ' + str(self.server.questionList[self.position]["options"][item]), 'default').pack(side="top", fill="x", pady=5)
-        
+            
         self.status = self.createLabel('Players are answering...', 'default')
         self.status.pack(side="top", fill="x", pady=30)
 
         x = threading.Thread(target=self.sendQuestion).start()
-
+        self.done = False
+        self.timeOut = False
+        x = threading.Thread(target=self.timer).start()
+            
     def sendQuestion(self):
         self.server.handleNextQuestion()
-
-        if self.server.wait():
+        
+        if self.server.wait() and self.timeOut == False:
             self.status.destroy()
+            self.done = True
             self.createButton('View scores', 'confirm', lambda: self.master.switch_frame(HostQuizScoreScreen, self.server, self.position+1)).pack(side="top", fill="x", pady=20)
 
+    def timer(self):
+        while self.done != True:
+            if len(self.server.clients) < 1:
+                self.timeOut = True
+                self.master.switch_frame(HostQuizDisconnectScreen, self.server)
+                break
+        
+class HostQuizDisconnectScreen(BaseScreen):
+    # master = self from QuizApp
+    def __init__(self, master, *args):
+
+        # extend from BaseScreen
+        BaseScreen.__init__(self, master)
+        self.master = master
+
+        if args:
+            self.getArguments(*args)
+
+        # var server
+        self.server = self.args[0]
+
+        #layout
+        self.configure(bg=self.setBackgroundColor())
+        
+        self.createLabel('Host Quiz', 'title').pack(side="top", fill="x", pady=30)
+
+        self.createLabel("It appears all players have dropped out.", "default").pack(side="top", fill="x", pady=5)
+
+        self.createButton('Back to menu', 'return', lambda: self.master.switch_frame(HomeScreen)).pack(side="top", fill="x", pady=20)
+        
 
 # screen JOIN QUIZ
 class JoinQuizScreen(BaseScreen):
