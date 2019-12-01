@@ -389,21 +389,19 @@ class ManageQuizesScreen(BaseScreen):
 
     def showQuizes(self):
         # show all quizes from database
-        print('show quizes from database')
-
         q = Quiz()
         quizes = q.getDataFromDatabase()
-        print(f'db: {quizes}')
 
-        for item in quizes:
-            quizId = item[0]
-            self.createLabel(item[1], 'heading1').pack()
-            self.createButton('Delete', 'return', lambda quizId=quizId: self.deleteQuiz(quizId)).pack(side="top", fill="x",
-                                                                                                pady=5)
+        if len(quizes) == 0:
+            self.createLabel('There are no quizes made yet', 'default').pack(side="top", fill="x", pady=5)
+        else:
+            for item in quizes:
+                quizId = item[0]
+                self.createLabel(item[1], 'heading1').pack()
+                self.createButton('Delete', 'return', lambda quizId=quizId: self.deleteQuiz(quizId)).pack(side="top", fill="x",
+                                                                                                    pady=5)
 
     def deleteQuiz(self, quizId):
-        # delete quiz to do
-
         # db delete: quiz
         quiz = Quiz()
         quiz.deleteQuiz(quizId)
@@ -470,9 +468,12 @@ class HostQuizScreen(BaseScreen):
         quizes = q.getDataFromDatabase()
         print(f'db: {quizes}')
 
-        for item in quizes:
-            quizId = item[0]
-            self.createButton(item[1], 'default', lambda quizId=quizId: self.next(quizId)).pack(side="top",fill="x", pady=20)
+        if len(quizes) == 0:
+            self.createLabel('There are no quizes made yet', 'default').pack(side="top", fill="x", pady=5)
+        else:
+            for item in quizes:
+                quizId = item[0]
+                self.createButton(item[1], 'default', lambda quizId=quizId: self.next(quizId)).pack(side="top",fill="x", pady=20)
 
     def next(self, quizId):
         ip = self.ip.get()
