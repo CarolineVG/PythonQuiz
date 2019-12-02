@@ -1,6 +1,7 @@
 import threading
 import time
 from tkinter import *
+from PIL import ImageTk, Image
 from Classes.Quiz import Quiz
 from Classes.Question import Question
 from Classes.Sockets import Server
@@ -172,6 +173,17 @@ class BaseScreen(Frame):
                             activeforeground=self.labelForeColor, activebackground=self.labelBackColor, font=(self.fontFamily, self.labelFontSize, self.labelFontType))
 
         return radio
+
+    def createImage(self, path, *args): #args = x and y pixels for resizing. Without it the image will be created in original size
+        
+        if args and len(args) > 1:
+            image = ImageTk.PhotoImage(Image.open(path).resize((args[0],args[1])))
+        else:
+            image = ImageTk.PhotoImage(Image.open(path))
+            
+        label = Label(self, image=image, bg=self.labelBackColor)
+
+        return label
 
 # screen HOME
 class HomeScreen(BaseScreen):
@@ -950,6 +962,7 @@ class JoinQuizEndScreen(BaseScreen):
         if scores[0][0] == self.client.name:
             self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
             self.createLabel('You won! Congratulations!', 'heading1').pack(side="top", fill="x", pady=5)
+            self.createImage('./trophy.png', 250, 250).pack(side="top", fill="x", pady=(20,30))
         else:
             self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
             self.createLabel(f'{scores[0][0]} won!', 'heading1').pack(side="top", fill="x", pady=5)
