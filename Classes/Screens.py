@@ -6,7 +6,6 @@ from Classes.Quiz import Quiz
 from Classes.Question import Question
 from Classes.Sockets import Server
 from Classes.Sockets import Client
-
 from scapy.all import *
 
 # class QuizApp
@@ -14,7 +13,7 @@ class QuizApp(Tk):
     def __init__(self):
         Tk.__init__(self)
         self._frame = None
-        self.switch_frame(HomeScreen)
+        self.switchFrame(HomeScreen)
         self.configure(bg='#FE715B')
 
         # check size of screen
@@ -24,21 +23,20 @@ class QuizApp(Tk):
         self.geometry(pixels)
 
     # switch screens
-    def switch_frame(self, frame_class, *args):
+    def switchFrame(self, frameClass, *args):
         # frame_class = any class that has been given as a parameter
-        # assign self from QuizApp to frame_class
+        # assign self from QuizApp to frameClass
         if args:
-            print("args === "+str(args))
-            new_frame = frame_class(self, args)
+            newFrame = frameClass(self, args)
         else:
-            new_frame = frame_class(self)
+            newFrame = frameClass(self)
 
         # destroy current frame
         if self._frame is not None:
             self._frame.destroy()
 
         # assign new frame and show it
-        self._frame = new_frame
+        self._frame = newFrame
         self._frame.pack()
 
 
@@ -79,24 +77,16 @@ class BaseScreen(Frame):
     # get args
     def getArguments(self, args):
         self.args = args
-        print(f'arguments: {self.args}')
 
     def setBackgroundColor(self):
         return self.backgroundColor
 
     def createButton(self, text, type, method, *state):
         if state:
-            print('test ' + str(text))
             arg = state[0]
             self.newState = arg
         else:
             self.newState = 'normal'
-
-        # methods:
-        # function or switch screen
-        newMethod = method
-
-        # type (basic,...), method: , colors:
 
         # CONFIRM button: bg green
         if type == "confirm":
@@ -177,10 +167,12 @@ class BaseScreen(Frame):
     def createImage(self, path, *args): #args = x and y pixels for resizing. Without it the image will be created in original size
         
         if args and len(args) > 1:
-            image = ImageTk.PhotoImage(Image.open(path).resize((args[0],args[1])))
+            img = Image.open(path)
+            image = ImageTk.PhotoImage(img.resize((args[0],args[1])))
         else:
-            image = ImageTk.PhotoImage(Image.open(path))
-            
+            img = Image.open(path)
+            image = ImageTk.PhotoImage(img)
+
         label = Label(self, image=image, bg=self.labelBackColor)
 
         return label
@@ -201,10 +193,10 @@ class HomeScreen(BaseScreen):
 
         self.createLabel('Home', 'title').pack(side="top",fill="x",pady=30)
 
-        self.createButton('Create Quiz', 'default', lambda: master.switch_frame(CreateQuizScreen)).pack(side="top", fill="x", pady=20)
-        self.createButton('Manage Quizes', 'default', lambda: master.switch_frame(ManageQuizesScreen)).pack(side="top",fill="x",pady=20)
-        self.createButton('Host Quiz', 'default', lambda: master.switch_frame(HostQuizScreen, 'a')).pack(side="top",fill="x",pady=20)
-        self.createButton('Play Quiz', 'default', lambda: master.switch_frame(JoinQuizScreen)).pack(side="top",fill="x",pady=20)
+        self.createButton('Create Quiz', 'default', lambda: master.switchFrame(CreateQuizScreen)).pack(side="top", fill="x", pady=20)
+        self.createButton('Manage Quizes', 'default', lambda: master.switchFrame(ManageQuizesScreen)).pack(side="top", fill="x", pady=20)
+        self.createButton('Host Quiz', 'default', lambda: master.switchFrame(HostQuizScreen)).pack(side="top", fill="x", pady=20)
+        self.createButton('Play Quiz', 'default', lambda: master.switchFrame(JoinQuizScreen)).pack(side="top", fill="x", pady=20)
 
 
 # screen CREATE QUIZ
@@ -231,7 +223,7 @@ class CreateQuizScreen(BaseScreen):
         self.saveButton = self.createButton('Save', 'confirm', lambda: self.saveQuiz())
         self.saveButton.pack(side="top",fill="x",pady=10)
 
-        self.returnButton = self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen))
+        self.returnButton = self.createButton('Return', 'return', lambda: master.switchFrame(HomeScreen))
         self.returnButton.pack(side="top",fill="x",pady=10)
 
         self.errorLabel = self.createLabel('', 'default')
@@ -241,7 +233,6 @@ class CreateQuizScreen(BaseScreen):
         # validation
         q = self.quizValue.get()
         if len(q) == 0 or q == None:
-            print('empty')
             self.errorLabel.config(text='Please enter a quiz name')
         else:
             self.errorLabel.config(text='')
@@ -255,10 +246,9 @@ class CreateQuizScreen(BaseScreen):
             result = newQuiz.getIdFromQuizName(q)
 
             createQuizId = result[0]
-            print(createQuizId)
 
             # change button
-            self.saveButton.config(text='Add Questions',command=lambda: self.master.switch_frame(CreateQuestionScreen, createQuizId))
+            self.saveButton.config(text='Add Questions', command=lambda: self.master.switchFrame(CreateQuestionScreen, createQuizId))
             # disable return button (you can't make an empty quiz)
             self.returnButton.destroy()
 
@@ -330,7 +320,7 @@ class CreateQuestionScreen(BaseScreen):
         self.saveQuestionButton = self.createButton('Save Question', 'confirm', lambda: self.addQuestion())
         self.saveQuestionButton.pack(side="top", fill="x",pady=10)
 
-        self.finishQuizButton = self.createButton('Finish Quiz', 'confirm', lambda: master.switch_frame(HostQuizScreen), 'disabled')
+        self.finishQuizButton = self.createButton('Finish Quiz', 'confirm', lambda: master.switchFrame(HostQuizScreen), 'disabled')
         self.finishQuizButton.pack(side="top", fill="x",pady=10)
 
         self.errorLabel = self.createLabel('', 'default')
@@ -354,7 +344,6 @@ class CreateQuestionScreen(BaseScreen):
         emptyFields = False
         for v in values:
             if len(v) == 0 or v is None:
-                print('empty')
                 self.errorLabel.config(text='Please enter required fields')
                 emptyFields = True
 
@@ -399,7 +388,7 @@ class ManageQuizesScreen(BaseScreen):
 
         self.showQuizes()
 
-        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x", pady=20)
+        self.createButton('Return', 'return', lambda: master.switchFrame(HomeScreen)).pack(side="top", fill="x", pady=20)
 
     def showQuizes(self):
         # show all quizes from database
@@ -425,7 +414,7 @@ class ManageQuizesScreen(BaseScreen):
         question.deleteQuestion(quizId)
 
         # refresh screen
-        self.master.switch_frame(ManageQuizesScreen)
+        self.master.switchFrame(ManageQuizesScreen)
 
 
 # screen HOST QUIZ
@@ -460,27 +449,20 @@ class HostQuizScreen(BaseScreen):
 
         self.showQuizes()
 
-        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top", fill="x",pady=20)
+        self.createButton('Return', 'return', lambda: master.switchFrame(HomeScreen)).pack(side="top", fill="x", pady=20)
 
     def getIpFromPc(self):
-        print('f')
-        # TRY: get IP from pc
+        # get IP from pc
         result = get_windows_if_list()
-        print(result)
         for r in result:
             if r['name'] == 'WiFi' or r["name"] == "Wi-Fi":
                 ipAddress = r['ips'][1]
-            else:
-                print("wifi wasn't found")
         return ipAddress
 
     def showQuizes(self):
         # show all quizes from database
-        print('show quizes from database')
-
         q = Quiz()
         quizes = q.getDataFromDatabase()
-        print(f'db: {quizes}')
 
         if len(quizes) == 0:
             self.createLabel('There are no quizes made yet', 'default').pack(side="top", fill="x", pady=5)
@@ -500,7 +482,7 @@ class HostQuizScreen(BaseScreen):
         print("this should be a question list -> "+str(questions))
 
         server.setQuestionList(questions)
-        self.master.switch_frame(HostQuizWaitingScreen, server)
+        self.master.switchFrame(HostQuizWaitingScreen, server)
 
 
 # screen WAITING QUIZ
@@ -543,7 +525,7 @@ class HostQuizWaitingScreen(BaseScreen):
     def cancelQuiz(self):
         if self.start:
             self.server.endQuiz()
-            self.master.switch_frame(HomeScreen)
+            self.master.switchFrame(HomeScreen)
         else:
             self.cancel = True
 
@@ -560,24 +542,22 @@ class HostQuizWaitingScreen(BaseScreen):
                     self.continueButton.destroy()
                     break
                 else:
-                    self.continueButton.config(text='Start Quiz', command=lambda: self.master.switch_frame(HostQuizScoreScreen, self.server, 0))
+                    self.continueButton.config(text='Start Quiz', command=lambda: self.master.switchFrame(HostQuizScoreScreen, self.server, 0))
                     self.waitingLabel.config(text = "Ready to begin")
                     break
             elif self.cancel:
                 self.server.stopHosting()
                 self.server.endQuiz()
-                self.master.switch_frame(HomeScreen)
+                self.master.switchFrame(HomeScreen)
                 break
             else:
                 self.playersLabel.config(text = f"{str(len(self.server.clients))} players are connected")
     
     def startServer(self):
-        print("start server")
         self.server.host()
 
     def stopThread(self):
         # stop thread:
-        print("stop thread")
         self.start = True
 
 
@@ -602,7 +582,7 @@ class HostQuizScoreScreen(BaseScreen):
         if self.args[1] == 0:
             # first question
             position = self.args[1]
-            self.sendQuestionButton = self.createButton('Send First Question', 'confirm', lambda: master.switch_frame(HostQuizQuestionScreen, self.server, position))
+            self.sendQuestionButton = self.createButton('Send First Question', 'confirm', lambda: master.switchFrame(HostQuizQuestionScreen, self.server, position))
             self.sendQuestionButton.pack()
         else:
             # score
@@ -632,11 +612,11 @@ class HostQuizScoreScreen(BaseScreen):
                 self.createLabel(f"{scores[3][0]} came in third.", 'default').pack(side="top", fill="x", pady=5)
             self.createButton('End quiz', 'confirm', lambda: self.endQuiz()).pack()
         else:
-            self.createButton('Send the next question!', 'confirm', lambda: self.master.switch_frame(HostQuizQuestionScreen, self.server, position)).pack()
+            self.createButton('Send the next question!', 'confirm', lambda: self.master.switchFrame(HostQuizQuestionScreen, self.server, position)).pack()
 
     def endQuiz(self):
         self.server.endQuiz()
-        self.master.switch_frame(HomeScreen)
+        self.master.switchFrame(HomeScreen)
 
 
 # screen HOST QUIZ QUESTION
@@ -684,13 +664,13 @@ class HostQuizQuestionScreen(BaseScreen):
         if self.server.wait() and self.timeOut == False:
             self.status.destroy()
             self.done = True
-            self.createButton('View scores', 'confirm', lambda: self.master.switch_frame(HostQuizScoreScreen, self.server, self.position+1)).pack(side="top", fill="x", pady=20)
+            self.createButton('View scores', 'confirm', lambda: self.master.switchFrame(HostQuizScoreScreen, self.server, self.position + 1)).pack(side="top", fill="x", pady=20)
 
     def timer(self):
         while self.done != True:
             if len(self.server.clients) < 1:
                 self.timeOut = True
-                self.master.switch_frame(HostQuizDisconnectScreen, self.server)
+                self.master.switchFrame(HostQuizDisconnectScreen, self.server)
                 break
         
 class HostQuizDisconnectScreen(BaseScreen):
@@ -714,7 +694,7 @@ class HostQuizDisconnectScreen(BaseScreen):
 
         self.createLabel("It appears all players have dropped out.", "default").pack(side="top", fill="x", pady=5)
 
-        self.createButton('Back to menu', 'return', lambda: self.master.switch_frame(HomeScreen)).pack(side="top", fill="x", pady=20)
+        self.createButton('Back to menu', 'return', lambda: self.master.switchFrame(HomeScreen)).pack(side="top", fill="x", pady=20)
         
 
 # screen JOIN QUIZ
@@ -745,7 +725,7 @@ class JoinQuizScreen(BaseScreen):
         self.createInput(self.usernameValue, 'default').pack()
 
         self.createButton('Join', 'default', lambda: self.join()).pack(side="top", fill="x", pady=20)
-        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack()
+        self.createButton('Return', 'return', lambda: master.switchFrame(HomeScreen)).pack()
 
     def join(self):
         ip = self.ipValue.get()
@@ -756,7 +736,7 @@ class JoinQuizScreen(BaseScreen):
             username = "User"
         client.setName(username)
 
-        self.master.switch_frame(JoinQuizConnectScreen, client)
+        self.master.switchFrame(JoinQuizConnectScreen, client)
 
 
 # screen JOIN QUIZ CONNECT
@@ -785,16 +765,16 @@ class JoinQuizConnectScreen(BaseScreen):
             x = threading.Thread(target=self.receiveQuestion).start()
         else:
             connectingLabel.config(text="Failed to connect to host.")
-            self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack()
+            self.createButton('Return', 'return', lambda: master.switchFrame(HomeScreen)).pack()
 
     def receiveQuestion(self):
         self.createLabel('Waiting for the quiz master to send the first question', 'default').pack()
         self.client.listen()
         print("done listening")
         if self.client.ended:
-            self.master.switch_frame(JoinQuizDisconnectScreen, self.client)
+            self.master.switchFrame(JoinQuizDisconnectScreen, self.client)
         if self.client.getQuestion() != None:
-            self.master.switch_frame(JoinQuizQuestionScreen, self.client)
+            self.master.switchFrame(JoinQuizQuestionScreen, self.client)
 
 class JoinQuizDisconnectScreen(BaseScreen):
     # master = self from QuizApp
@@ -814,7 +794,7 @@ class JoinQuizDisconnectScreen(BaseScreen):
         self.configure(bg=self.setBackgroundColor())
         self.createLabel('Disconnected', 'title').pack(side="top", fill="x", pady=30)
         self.createLabel('The host has canceled the quiz.', 'default').pack()
-        self.createButton('Return', 'return', lambda: master.switch_frame(HomeScreen)).pack(side="top",pady=30)
+        self.createButton('Return', 'return', lambda: master.switchFrame(HomeScreen)).pack(side="top", pady=30)
 
 # screen JOIN QUIZ QUESTION
 class JoinQuizQuestionScreen(BaseScreen):
@@ -848,7 +828,7 @@ class JoinQuizQuestionScreen(BaseScreen):
         if self.answered == False:
             self.client.answer(option)
             self.answered = True
-            self.master.switch_frame(JoinQuizWaitingScreen, self.client)
+            self.master.switchFrame(JoinQuizWaitingScreen, self.client)
 
     def countdown(self, seconds):
         timer = self.createLabel("Time: "+str(seconds), 'default')
@@ -860,7 +840,7 @@ class JoinQuizQuestionScreen(BaseScreen):
             if seconds <= 0:
                 self.client.answer(False)
                 self.answered = True
-                self.master.switch_frame(JoinQuizWaitingScreen, self.client, "timeout")
+                self.master.switchFrame(JoinQuizWaitingScreen, self.client, "timeout")
                 break
             seconds = seconds - 1
 
@@ -897,7 +877,7 @@ class JoinQuizWaitingScreen(BaseScreen):
         self.client.listen()
         print("done listening")
         if self.client.getScores() != None:
-            self.master.switch_frame(JoinQuizScoreScreen, self.client)
+            self.master.switchFrame(JoinQuizScoreScreen, self.client)
 
 
 # screen JOIN QUIZ SCORE
@@ -937,10 +917,10 @@ class JoinQuizScoreScreen(BaseScreen):
         self.client.listen()
         print("done listening")
         if self.client.ended:
-            self.master.switch_frame(JoinQuizEndScreen, self.client)
+            self.master.switchFrame(JoinQuizEndScreen, self.client)
             
         elif self.client.getQuestion() != None:
-            self.master.switch_frame(JoinQuizQuestionScreen, self.client)
+            self.master.switchFrame(JoinQuizQuestionScreen, self.client)
 
 
 # screen JOIN QUIZ END
@@ -975,4 +955,4 @@ class JoinQuizEndScreen(BaseScreen):
             self.createLabel('Play Quiz', 'title').pack(side="top", fill="x", pady=30)
             self.createLabel('You came in third!', 'default').pack()
         self.client.end()
-        self.createButton('Return to home screen', 'confirm', lambda: master.switch_frame(HomeScreen)).pack()
+        self.createButton('Return to home screen', 'confirm', lambda: master.switchFrame(HomeScreen)).pack()

@@ -1,5 +1,4 @@
-from Classes.Screen import QuizApp
-from Classes.Sockets import Server
+from Classes.Screens import QuizApp
 
 
 # window MAIN

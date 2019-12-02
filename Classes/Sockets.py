@@ -1,10 +1,8 @@
 import socket
 import pickle
-import random
 import json
 import threading
 import time
-import sys
 
 class Server:
     def __init__(self, ip, port):

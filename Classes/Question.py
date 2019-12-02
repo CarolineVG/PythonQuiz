@@ -1,11 +1,8 @@
 # class Question
-import json
-
 from Classes.Database import Database
 
 
 class Question:
-    questionNumber = 0
 
     def __init__(self):
         self.quizId = 0
@@ -47,13 +44,11 @@ class Question:
         # get data from db
         cursor.execute('SELECT * FROM Questions')
         records = cursor.fetchall()
-        print(f'db - {records}')
 
     def createQuizWithQuestions(self, val):
         # CREATE LIST OF ALL QUESTION FROM SAME QUIZ ID
         quizId = val
 
-        # test with first question
         db = Database()
         conn = db.getConnection()
         cursor = conn.cursor()
@@ -65,7 +60,6 @@ class Question:
         questionsDictionary = []
 
         i = 0
-
         for i in range(len(records)):
             q = records[i]
 
@@ -91,18 +85,13 @@ class Question:
             }
 
             questionsDictionary.append(question)
-
-            print(f'string: {question}')
             i = i+1
 
-        print(f'Quiz: {questionsDictionary}')
         db.closeConnection()
         return questionsDictionary
 
     def deleteQuestion(self, val):
-        print('delete')
         id = val
-        print(id)
         db = Database()
         conn = db.getConnection()
         cursor = conn.cursor()

@@ -5,10 +5,7 @@ from Classes.Database import Database
 class Quiz:
     def __init__(self):
         self.quizName = ''
-
-    def __init__(self):
         self.id = id
-
 
     def addQuizToDatabase(self):
         db = Database()
@@ -31,7 +28,6 @@ class Quiz:
         # get data from db
         cursor.execute('SELECT * FROM Quizes')
         records = cursor.fetchall()
-        print(f'db - {records}')
 
         return records
 
@@ -51,9 +47,7 @@ class Quiz:
         return records
 
     def deleteQuiz(self, val):
-        print('delete')
         id = val
-        print(id)
         db = Database()
         conn = db.getConnection()
         cursor = conn.cursor()
