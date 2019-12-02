@@ -72,13 +72,13 @@ class Question:
             # options
             options = {}
 
-            if q[4] != None:
+            if q[4]:
                 options["option1"] = q[4]
-            if q[5] != None:
+            if q[5]:
                 options["option2"] = q[5]
-            if q[6] != None:
+            if q[6]:
                 options["option3"] = q[6]
-            if q[7] != None:
+            if q[7]:
                 options["option4"] = q[7]
 
             question = {
@@ -87,8 +87,7 @@ class Question:
                 "solution": q[3],
                 "options": options,
                 "time": q[8],
-                "points": str(q[9]),
-                "score": str(10)
+                "score": q[9]
             }
 
             questionsDictionary.append(question)

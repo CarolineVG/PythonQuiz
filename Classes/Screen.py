@@ -319,10 +319,12 @@ class CreateQuestionScreen(BaseScreen):
 
         self.createLabel('Timer*', 'default').pack()
         self.timerInput = self.createInput(self.timerValue, 'default')
+        self.timerInput.insert(0, "30")
         self.timerInput.pack()
 
         self.createLabel('Points*', 'default').pack()
         self.pointsInput = self.createInput(self.pointsValue, 'default')
+        self.pointsInput.insert(0, "10")
         self.pointsInput.pack()
 
         self.saveQuestionButton = self.createButton('Save Question', 'confirm', lambda: self.addQuestion())
@@ -371,8 +373,8 @@ class CreateQuestionScreen(BaseScreen):
             self.answer2Value.set("")
             self.answer3Value.set("")
             self.answer4Value.set("")
-            self.timerValue.set("")
-            self.pointsValue.set("")
+            self.timerValue.set("30")
+            self.pointsValue.set("10")
 
             # change finish button from disabled to active
             self.finishQuizButton.config(state="normal")
