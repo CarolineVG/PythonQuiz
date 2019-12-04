@@ -456,7 +456,13 @@ class HostQuizScreen(BaseScreen):
         result = get_windows_if_list()
         for r in result:
             if r['name'] == 'WiFi' or r["name"] == "Wi-Fi":
-                ipAddress = r['ips'][1]
+                print(r)
+                # check if in ips ipv4 addres with regex
+                for i in r['ips']:
+                    if re.search("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", i):
+                        print("ipv4")
+                        ipAddress = i
+
         return ipAddress
 
     def showQuizes(self):
