@@ -436,6 +436,9 @@ class HostQuizScreen(BaseScreen):
 
         self.createLabel('Enter your IP:', 'default').pack(side="top", fill="x", pady=5)
 
+        self.errorLabel = self.createLabel('', 'default')
+        self.errorLabel.pack(side="top", fill="x", pady=30)
+
         self.ip = StringVar()
 
         # get IP from pc
@@ -478,17 +481,26 @@ class HostQuizScreen(BaseScreen):
                 self.createButton(item[1], 'default', lambda quizId=quizId: self.next(quizId)).pack(side="top",fill="x", pady=20)
 
     def next(self, quizId):
-        ip = self.ip.get()
-        print(ip)
-        server = Server(ip, 5000)
+        # validation for ip address
+        if re.search("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", self.ip.get()):
+            self.errorLabel.config(text='')
+            print('ok')
 
-        print("this should be our quiz id -> "+str(quizId))
-        q = Question()
-        questions = q.createQuizWithQuestions(quizId)
-        print("this should be a question list -> "+str(questions))
+            ip = self.ip.get()
+            print(ip)
+            server = Server(ip, 5000)
 
-        server.setQuestionList(questions)
-        self.master.switchFrame(HostQuizWaitingScreen, server)
+            print("this should be our quiz id -> " + str(quizId))
+            q = Question()
+            questions = q.createQuizWithQuestions(quizId)
+            print("this should be a question list -> " + str(questions))
+
+            server.setQuestionList(questions)
+            self.master.switchFrame(HostQuizWaitingScreen, server)
+        else:
+            self.errorLabel.config(text='Please enter a valid IP address')
+
+
 
 
 # screen WAITING QUIZ
