@@ -436,9 +436,6 @@ class HostQuizScreen(BaseScreen):
 
         self.createLabel('Enter your IP:', 'default').pack(side="top", fill="x", pady=5)
 
-        self.errorLabel = self.createLabel('', 'default')
-        self.errorLabel.pack(side="top", fill="x", pady=30)
-
         self.ip = StringVar()
 
         # get IP from pc
@@ -447,6 +444,9 @@ class HostQuizScreen(BaseScreen):
         ipLabel = self.createInput(self.ip, 'default')
         ipLabel.pack()
         ipLabel.insert(0, self.ipFromWifi)
+
+        self.errorLabel = self.createLabel('', 'default')
+        self.errorLabel.pack(side="top", fill="x", pady=5)
 
         self.createLabel('Choose which quiz to host:', 'default').pack(side="top", fill="x", pady=5)
 
@@ -482,18 +482,12 @@ class HostQuizScreen(BaseScreen):
 
     def next(self, quizId):
         # validation for ip address
-        if re.search("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", self.ip.get()):
-            self.errorLabel.config(text='')
-            print('ok')
-
+        if re.search("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", self.ip.get()) or self.ipValue.get() == "":
             ip = self.ip.get()
-            print(ip)
             server = Server(ip, 5000)
-
-            print("this should be our quiz id -> " + str(quizId))
+            
             q = Question()
             questions = q.createQuizWithQuestions(quizId)
-            print("this should be a question list -> " + str(questions))
 
             server.setQuestionList(questions)
             self.master.switchFrame(HostQuizWaitingScreen, server)
@@ -739,6 +733,9 @@ class JoinQuizScreen(BaseScreen):
         self.createLabel('Enter ip', 'default').pack()
         self.createInput(self.ipValue, 'default').pack()
 
+        self.errorLabel = self.createLabel('', 'default')
+        self.errorLabel.pack(side="top", fill="x", pady=5)
+
         self.createLabel('Enter nickname', 'default').pack()
         self.createInput(self.usernameValue, 'default').pack()
 
@@ -746,16 +743,18 @@ class JoinQuizScreen(BaseScreen):
         self.createButton('Return', 'return', lambda: master.switchFrame(HomeScreen)).pack()
 
     def join(self):
-        ip = self.ipValue.get()
-        client = Client(ip, 5000)
-        
-        username = self.usernameValue.get()
-        if username == "":
-            username = "User"
-        client.setName(username)
+        if re.search("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", self.ipValue.get()) or self.ipValue.get() == "":
+            ip = self.ipValue.get()
+            client = Client(ip, 5000)
+            
+            username = self.usernameValue.get()
+            if username == "":
+                username = "User"
+            client.setName(username)
 
-        self.master.switchFrame(JoinQuizConnectScreen, client)
-
+            self.master.switchFrame(JoinQuizConnectScreen, client)
+        else:
+            self.errorLabel.config(text='Please enter a valid IP address')
 
 # screen JOIN QUIZ CONNECT
 class JoinQuizConnectScreen(BaseScreen):
