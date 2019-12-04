@@ -490,7 +490,7 @@ class HostQuizScreen(BaseScreen):
             questions = q.createQuizWithQuestions(quizId)
 
             server.setQuestionList(questions)
-            self.master.switchFrame(HostQuizWaitingScreen, server)
+            self.master.switchFrame(HostQuizWaitingScreen, server, ip)
         else:
             self.errorLabel.config(text='Please enter a valid IP address')
 
@@ -511,6 +511,7 @@ class HostQuizWaitingScreen(BaseScreen):
 
         # var server
         self.server = self.args[0]
+        ip = self.args[1]
         self.start = False
         self.cancel = False
 
@@ -520,9 +521,11 @@ class HostQuizWaitingScreen(BaseScreen):
         self.configure(bg=self.setBackgroundColor())
         
         self.createLabel('Host Quiz', 'title').pack(side="top", fill="x", pady=30)
+
+        self.createLabel(ip, 'heading1').pack(side="top", fill="x", pady=5)
         
         self.waitingLabel = self.createLabel('Waiting for players...', 'default')
-        self.waitingLabel.pack(side="top", fill="x", pady=5)
+        self.waitingLabel.pack(side="top", fill="x", pady=10)
         
         self.playersLabel = self.createLabel('f"{str(len(self.server.clients))} players are connected"', 'default')
         self.playersLabel.pack()
