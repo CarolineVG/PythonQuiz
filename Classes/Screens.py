@@ -62,7 +62,7 @@ class BaseScreen(Frame):
         self.buttonBackColor = "#FFF"
         self.buttonActiveForeColor = "#850001"
         self.buttonActiveBackColor = "#EDEDED"
-        self.buttonWidth = 18
+        self.buttonWidth = 30
         self.buttonFontFamily = self.fontFamily
         self.buttonFontSize = 18
         self.buttonFontType = "bold"
@@ -141,6 +141,15 @@ class BaseScreen(Frame):
 
             label = Label(self, text=text, fg=self.labelForeColor, bg=self.labelBackColor,
                           font=(self.fontFamily, newLabelFontSize, newLabelFontType))
+        # ERROR
+        elif type == "error":
+            newLabelFontSize = 18
+            newLabelFontType = 'bold'
+            newLabelForeColor = 'red'
+
+            label = Label(self, text=text, fg=newLabelForeColor, bg=self.labelBackColor,
+                          font=(self.fontFamily, newLabelFontSize, newLabelFontType))
+        
         # DEFAULT
         elif type == "default":
             label = Label(self, text=text, fg=self.labelForeColor, bg=self.labelBackColor,
@@ -227,7 +236,7 @@ class CreateQuizScreen(BaseScreen):
         self.returnButton = self.createButton('Return', 'return', lambda: master.switchFrame(HomeScreen))
         self.returnButton.pack(side="top",fill="x",pady=10)
 
-        self.errorLabel = self.createLabel('', 'default')
+        self.errorLabel = self.createLabel('', 'error')
         self.errorLabel.pack(side="top", fill="x", pady=30)
 
     def saveQuiz(self):
@@ -324,7 +333,7 @@ class CreateQuestionScreen(BaseScreen):
         self.finishQuizButton = self.createButton('Finish Quiz', 'confirm', lambda: master.switchFrame(HostQuizScreen), 'disabled')
         self.finishQuizButton.pack(side="top", fill="x",pady=10)
 
-        self.errorLabel = self.createLabel('', 'default')
+        self.errorLabel = self.createLabel('', 'error')
         self.errorLabel.pack(side="top", fill="x", pady=30)
 
     def addQuestion(self):
@@ -446,7 +455,7 @@ class HostQuizScreen(BaseScreen):
         ipLabel.pack()
         ipLabel.insert(0, self.ipFromWifi)
 
-        self.errorLabel = self.createLabel('', 'default')
+        self.errorLabel = self.createLabel('', 'error')
         self.errorLabel.pack(side="top", fill="x", pady=5)
 
         self.createLabel('Choose which quiz to host:', 'default').pack(side="top", fill="x", pady=5)
@@ -460,11 +469,9 @@ class HostQuizScreen(BaseScreen):
         result = get_windows_if_list()
         for r in result:
             if r['name'] == 'WiFi' or r["name"] == "Wi-Fi":
-                print(r)
                 # check if in ips ipv4 addres with regex
                 for i in r['ips']:
                     if re.search("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", i):
-                        print("ipv4")
                         ipAddress = i
 
         return ipAddress
@@ -475,7 +482,7 @@ class HostQuizScreen(BaseScreen):
         quizes = q.getDataFromDatabase()
 
         if len(quizes) == 0:
-            self.createLabel('There are no quizes made yet', 'default').pack(side="top", fill="x", pady=5)
+            self.createLabel('There are no quizes made yet', 'error').pack(side="top", fill="x", pady=5)
         else:
             for item in quizes:
                 quizId = item[0]
@@ -494,9 +501,6 @@ class HostQuizScreen(BaseScreen):
             self.master.switchFrame(HostQuizWaitingScreen, server, ip)
         else:
             self.errorLabel.config(text='Please enter a valid IP address')
-
-
-
 
 # screen WAITING QUIZ
 class HostQuizWaitingScreen(BaseScreen):

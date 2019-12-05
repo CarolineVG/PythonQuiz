@@ -220,8 +220,10 @@ class Server: #to be used in the GUI of the quiz master
     def endQuiz(self): #send a message to the clients telling them the server has closed down. They then do whatever they want with it.
         message = '{"type":"end", "scoreboard":'+json.dumps(self.scores)+', "endMessage":"'+self.endMessage+'"}'
         self.sendToAll(message)
+        print("disconnecting all client sockets")
         for c in self.clients:
             c.close()
+        print("done.")
 
 
 
@@ -377,7 +379,9 @@ class Client: #to be used in the GUI of players
         return self.endMessage
 
     def end(self): #close the connection
+        print("disconnecting from server")
         self.server.close()
+        print("done.")
 
 
 

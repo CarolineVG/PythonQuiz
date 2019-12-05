@@ -56,7 +56,6 @@ class Question:
         # get data from db
         cursor.execute('SELECT * FROM Questions WHERE QuizId = ?', (quizId,))
         records = cursor.fetchall()
-        print(f'questions {quizId} - {records}')
         questionsDictionary = []
 
         i = 0
