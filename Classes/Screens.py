@@ -8,11 +8,11 @@ from Classes.Sockets import Server
 from Classes.Sockets import Client
 from scapy.all import *
 
-# class QuizApp
+#class QuizApp puts new frames/screens into the window
 class QuizApp(Tk):
-    def __init__(self):
+    def __init__(self): #configure and set up HomeScreen frame
         Tk.__init__(self)
-        self._frame = None
+        self.frame = None
         self.switchFrame(HomeScreen)
         self.configure(bg='#FE715B')
 
@@ -25,22 +25,23 @@ class QuizApp(Tk):
     # switch screens
     def switchFrame(self, frameClass, *args):
         # frameClass = any class that has been given as a parameter
-        # assign self from QuizApp to frameClass
+        # assign self from QuizApp to frameClass (this is called 'master' in the frameClass)
         if args:
             newFrame = frameClass(self, args)
         else:
             newFrame = frameClass(self)
 
         # destroy current frame
-        if self._frame is not None:
-            self._frame.destroy()
+        if self.frame is not None:
+            self.frame.destroy()
 
         # assign new frame and show it
-        self._frame = newFrame
-        self._frame.pack()
+        self.frame = newFrame
+        self.frame.pack()
 
 
 # class BASESCREEN extends from frame, other screen classes will extend from basescreen
+# sets up default layout variables and provides helpful functions for building labels, buttons, entries,...
 class BaseScreen(Frame):
     # constructor
     def __init__(self, master):
@@ -61,7 +62,7 @@ class BaseScreen(Frame):
         self.buttonBackColor = "#FFF"
         self.buttonActiveForeColor = "#850001"
         self.buttonActiveBackColor = "#EDEDED"
-        self.buttonWidth = 30
+        self.buttonWidth = 18
         self.buttonFontFamily = self.fontFamily
         self.buttonFontSize = 18
         self.buttonFontType = "bold"
@@ -139,14 +140,6 @@ class BaseScreen(Frame):
             newLabelFontType = 'bold'
 
             label = Label(self, text=text, fg=self.labelForeColor, bg=self.labelBackColor,
-                          font=(self.fontFamily, newLabelFontSize, newLabelFontType))
-        # ERROR
-        elif type == "error":
-            newLabelFontSize = 18
-            newLabelFontType = 'bold'
-            newLabelForeColor = 'red'
-
-            label = Label(self, text=text, fg=newLabelForeColor, bg=self.labelBackColor,
                           font=(self.fontFamily, newLabelFontSize, newLabelFontType))
         # DEFAULT
         elif type == "default":
@@ -234,7 +227,7 @@ class CreateQuizScreen(BaseScreen):
         self.returnButton = self.createButton('Return', 'return', lambda: master.switchFrame(HomeScreen))
         self.returnButton.pack(side="top",fill="x",pady=10)
 
-        self.errorLabel = self.createLabel('', 'error')
+        self.errorLabel = self.createLabel('', 'default')
         self.errorLabel.pack(side="top", fill="x", pady=30)
 
     def saveQuiz(self):
@@ -331,18 +324,18 @@ class CreateQuestionScreen(BaseScreen):
         self.finishQuizButton = self.createButton('Finish Quiz', 'confirm', lambda: master.switchFrame(HostQuizScreen), 'disabled')
         self.finishQuizButton.pack(side="top", fill="x",pady=10)
 
-        self.errorLabel = self.createLabel('', 'error')
+        self.errorLabel = self.createLabel('', 'default')
         self.errorLabel.pack(side="top", fill="x", pady=30)
 
     def addQuestion(self):
         # create new Quiz
         print(f'Quiz Id: {self.quizId}')
 
-        q = self.questionValue.get()
-        a1 = self.answer1Value.get()
-        a2 = self.answer2Value.get()
-        a3 = self.answer3Value.get()
-        a4 = self.answer4Value.get()
+        q = str(self.questionValue.get()).replace('"',"'")
+        a1 = str(self.answer1Value.get()).replace('"',"'")
+        a2 = str(self.answer2Value.get()).replace('"',"'")
+        a3 = str(self.answer3Value.get()).replace('"',"'")
+        a4 = str(self.answer4Value.get()).replace('"',"'")
         s = self.solutionValue.get()
         t = self.timerValue.get()
         p = self.pointsValue.get()
@@ -453,7 +446,7 @@ class HostQuizScreen(BaseScreen):
         ipLabel.pack()
         ipLabel.insert(0, self.ipFromWifi)
 
-        self.errorLabel = self.createLabel('', 'error')
+        self.errorLabel = self.createLabel('', 'default')
         self.errorLabel.pack(side="top", fill="x", pady=5)
 
         self.createLabel('Choose which quiz to host:', 'default').pack(side="top", fill="x", pady=5)
@@ -482,7 +475,7 @@ class HostQuizScreen(BaseScreen):
         quizes = q.getDataFromDatabase()
 
         if len(quizes) == 0:
-            self.createLabel('There are no quizes made yet', 'error').pack(side="top", fill="x", pady=5)
+            self.createLabel('There are no quizes made yet', 'default').pack(side="top", fill="x", pady=5)
         else:
             for item in quizes:
                 quizId = item[0]
@@ -530,6 +523,8 @@ class HostQuizWaitingScreen(BaseScreen):
         
         self.createLabel('Host Quiz', 'title').pack(side="top", fill="x", pady=30)
 
+        if ip == "":
+            ip = "Localhost"
         self.createLabel(ip, 'heading1').pack(side="top", fill="x", pady=5)
         
         self.waitingLabel = self.createLabel('Waiting for players...', 'default')

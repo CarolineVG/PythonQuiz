@@ -4,7 +4,7 @@ import json
 import threading
 import time
 
-class Server:
+class Server: #to be used in the GUI of the quiz master
     def __init__(self, ip, port):
         #standard variables
         self.ip = ip
@@ -23,26 +23,26 @@ class Server:
         self.answers = 0 #a counter that keeps track of how many clients have answered already. Resets with every new question.
         self.endMessage = "Thank you for playing this Quiz!"
 
-    def host(self):
+    def host(self): #sets access to True and starts a new thread where connections with clients are made (connectClients())
         self.access = True
         a = threading.Thread(target=self.connectClients)
         a.start()
 
-    def connectClients(self):
+    def connectClients(self): #checks for a new connection every 0.5 seconds.
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((self.ip, self.port))
         s.listen(5)
-        s.setblocking(0)
+        s.setblocking(0) #We use blocking sockets, but in the case of s.accept() it should be non-blocking so this thread can be closed down
         while True:
             if self.access == True:
                 try:
                     clientsocket, address = s.accept()
                     if self.access == False:
-                        #send back message to client so the client will close connection (I can't figure out how to do it from here)
+                        #send back message to client so the client will close connection
                         #since this part was edited to be non-blocking this barely happens anymore
                         self.sendToClient(clientsocket, '{"type":"connection refused"}')
                     else:
-                        clientsocket.setblocking(1)
+                        clientsocket.setblocking(1) # for the rest of the program blocking sockets are fine, so we're setting it back to default for all client connections
                         self.clients.add(clientsocket)
                     print(f"{len(self.clients)} players have connected.")
                 except:
@@ -52,7 +52,7 @@ class Server:
                 print("hosting is stopped")
                 break
     
-    def stopHosting(self):
+    def stopHosting(self): #shut down the connectClients() thread by setting access to False, and check if we've found any players
         self.access = False
         print("")
         if len(self.clients)>=1:
@@ -61,23 +61,23 @@ class Server:
         else:
             print("No players were found.")
 
-    def sendToClient(self, client, json):
+    def sendToClient(self, client, json): #accepts a json string an sends it to a single client
         message = pickle.dumps(json)
-        print(message)
+        #print(message)
         message = bytes(f'{len(message):<{self.headerSize}}', "utf-8") + message
         try:
             client.send(message)
-        except:
+        except: #in case of a disconnected client an exception could occur here. This needs to be detected so the program never waits for a client that is no longer there.
             print("a client has disconnected (scenario 1)")
+            #remove this player from the set
             client.close()
             self.clients.remove(client)
-            print("len in Sockets.py scenario 1 = "+str(len(self.clients)))
 
-    def sendToAll(self, json):
+    def sendToAll(self, json): #accepts a json string and sends it to all clients
         for c in self.clients:
             self.sendToClient(c, json)
 
-    def sendQuestion(self, client, question):
+    def sendQuestion(self, client, question): #sends a question (a dictionary) to a single client
         if 'score' in question:
             score = question['score']
         else:
@@ -88,7 +88,7 @@ class Server:
             question = '{"type":"question", "sender": "Host", "question": "'+question['question']+'", "options":'+json.dumps(question['options'])+',"score":'+str(score)+'}'
         self.sendToClient(client, question)
 
-    def updateScores(self, name, answer, solution, score):
+    def updateScores(self, name, answer, solution, score): #accepts a name, their answer, the correct answer, and the score the question is worth. Updates the scores if the player answered correctly
         #check if the answer was correct
         if answer == solution:
             #check if client is already in the scores
@@ -99,20 +99,20 @@ class Server:
         elif name not in self.scores:
             self.scores[name] = 0
 
-    def sortScores(self, scores):
-        top5 = []
+    def sortScores(self, scores): #returns a sorted list of scores
+        top = []
         for record in scores:
-            top5.append([record, scores[record]])
-        top5.sort(key=lambda x: x[1], reverse=True)
-        return top5
+            top.append([record, scores[record]])
+        top.sort(key=lambda x: x[1], reverse=True)
+        return top
 
-    def everyoneAnswered(self):
+    def everyoneAnswered(self): #just checks if everyone has answered the latest question or not
         if self.answers == len(self.clients):
             return True
         else:
             return False
 
-    def receiveAnswer(self, client, solution):
+    def receiveAnswer(self, client, solution): #receives an answer from a client.
         fullAnswer = b''
         newAnswer = True
         while True:
@@ -131,15 +131,15 @@ class Server:
 
                     self.updateScores(answer["sender"], answer["answer"], solution, answer["score"])
                     
-                    if self.everyoneAnswered():
+                    if self.everyoneAnswered(): #if this is the last client that has answered, the server is ready to continue with the quiz.
                         #all players have answered.
                         self.answers = 0
                         self.currentQuestion = self.currentQuestion + 1
                         self.ready = True
                     return
-            except:
+            except: #in case of a disconnected client an exception could occur here. This needs to be detected so the program never waits for a client that is no longer there.
                 print("a client has disconnected (scenario 2)")
-                #remove this player from the list.
+                #remove this player from the set.
                 client.close()
                 self.clients.remove(client)
                 #check if everyone has answered
@@ -156,28 +156,23 @@ class Server:
     def getSortedScores(self):
         return self.sortScores(self.scores)
 
-    def wait(self):
+    def wait(self): #pause the current thread untill the server is ready
         if self.ready == False:
             print("waiting...")
         while True:
             if self.ready:
+                print("waiting is over")
                 return True
             
-    def waitAndGetScores(self):
-        if self.ready == False:
-            print("waiting for the scores...")
-        while True:
-            if self.ready:
-                return self.scores
+    def waitAndGetScores(self): #pause the current thread untill the server is ready, then return scores
+        self.wait()
+        return self.scores
             
-    def waitAndGetSortedScores(self):
-        if self.ready == False:
-            print("waiting for the scores...")
-        while True:
-            if self.ready:
-                return sortScores(self.scores)
+    def waitAndGetSortedScores(self): #pause the current thread untill the server is ready, then return scores in a sorted list
+        self.wait()
+        return sortScores(self.scores)
 
-    def sendScores(self):
+    def sendScores(self): #send the scores to all clients
         solution = self.questionList[self.currentQuestion-1]["options"][self.questionList[self.currentQuestion-1]["solution"]]
         if self.lastQuestion():
             scoreboard = '{"type":"scores", "solution":"'+solution+'", "scoreboard":'+json.dumps(self.scores)+',"endMessage":"Thank you for playing!"}'
@@ -185,23 +180,16 @@ class Server:
             scoreboard = '{"type":"scores", "solution":"'+solution+'", "scoreboard":'+json.dumps(self.scores)+'}'
         self.sendToAll(scoreboard)
 
-    def waitAndSendScores(self):
-        if self.ready == False:
-            print("Waiting for the scores...")
-        while True:
-            if self.ready:
-                print("Scores are in.")
-                self.sendScores()
-                return
+    def waitAndSendScores(self): #pause the current thread untill the server is ready, then send the scores to all clients
+        self.wait()
+        print("Scores are in.")
+        self.sendScores()
     
-    def nextQuestionThread(self, position, client):
+    def nextQuestionThread(self, position, client): #will send a question to a client, then receive their answer
         self.sendQuestion(client, self.questionList[position])
         self.receiveAnswer(client, self.questionList[position]['solution'])
-        if self.ready:
-            time.sleep(1)
-            return
                 
-    def handleNextQuestion(self):
+    def handleNextQuestion(self): #will send the next question (depending on self.currentQuestion) to all clients, then receive all the answers. One thread per client is created.
         if self.ready:
             self.ready = False
             print(f"sending question {self.currentQuestion+1}")
@@ -211,32 +199,33 @@ class Server:
         else:
             print("Not ready! We're still waiting for all clients.")
 
-    def setQuestionList(self, questionList):
+    def setQuestionList(self, questionList): #accepts a list of dictionaries
         self.questionList = questionList
         
-    def addQuestion(self, dictionary):
+    def addQuestion(self, dictionary): #accepts a dictionary
         self.questionList.append(dictionary)
 
-    def lastQuestion(self):
+    def lastQuestion(self): #checks if we are at the last question or not. Returns True or False
         if self.currentQuestion == len(self.questionList)-1:
             return True
         else:
             return False
 
-    def setEndMessage(self, string):
+    def setEndMessage(self, string): #sets the end message of the quiz (turns out we don't use end messages, but oh well)
         self.endMessage = string
 
-    def getCurrentTimer(self):
+    def getCurrentTimer(self): #get the timer of the current question (total amount of time a player gets to answer)
         return self.questionList[self.currentQuestion]["time"]
         
-    def endQuiz(self): #send an end message to the other programs. They then do whatever they want with it.
+    def endQuiz(self): #send a message to the clients telling them the server has closed down. They then do whatever they want with it.
         message = '{"type":"end", "scoreboard":'+json.dumps(self.scores)+', "endMessage":"'+self.endMessage+'"}'
         self.sendToAll(message)
         for c in self.clients:
-            print(str(c))
             c.close()
 
-class Client:
+
+
+class Client: #to be used in the GUI of players
     def __init__(self, ip, port):
         #standard variables
         self.ip = ip
@@ -246,16 +235,16 @@ class Client:
         self.headerSize = 10 #length of header before every send message, that specifies how long the whole message is
 
         #client variables
-        self.server = None
+        self.server = None #the server socket
         self.name = None #name of this client on the scoreboard
-        self.lastMessage = None
-        self.newQuestion = None
-        self.newScores = None
-        self.ended = False
+        self.lastMessage = None # the last message the server has send
+        self.newQuestion = None # the last question the server has send. If the server has send no question you haven't answered yes, this will be None
+        self.newScores = None # the last scores the server has send
+        self.ended = False #this variable helps to check in the GUI if the quiz has ended or not
         self.endMessage = None
-        self.solution = None
+        self.solution = None #the correct answer to the last question you answered
     
-    def join(self):
+    def join(self): #connect to a server
         try:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server.connect((self.ip, self.port))
@@ -271,14 +260,14 @@ class Client:
     def getName(self, string):
         return self.name
 
-    def sortScores(self, scores):
-        top5 = []
+    def sortScores(self, scores): #convert the received scores to a sorted list
+        top = []
         for record in scores:
-            top5.append([record, scores[record]])
-        top5.sort(key=lambda x: x[1], reverse=True)
-        return top5
+            top.append([record, scores[record]])
+        top.sort(key=lambda x: x[1], reverse=True)
+        return top
 
-    def listen(self):
+    def listen(self): #wait for a new message from the server and get all required information when it arrives
         self.newQuestion = None
         self.newScores = None
         
@@ -335,7 +324,7 @@ class Client:
             print("No question was asked")
             return None
 
-    def answer(self, answer):
+    def answer(self, answer): #send an answer to the server. It is possible to put False, None or "out of time" as answer for when the user was too late to answer
         if self.newQuestion != None:
             if answer == False or answer == None or answer == "out of time":
                 answer = '{"sender":"'+self.name+'", "answer":"out of time", "score":'+str(self.getQuestionScore())+'}'
@@ -353,7 +342,7 @@ class Client:
         else:
             print("You couldn't answer. Either no question was asked or you were too late.")
 
-    def getTime(self):
+    def getTime(self): #returns the time in which the current question needs to be answered. Integer
         if self.newQuestion != None:
             if 'time' in self.lastMessage:
                 return self.newQuestion['time']
@@ -363,21 +352,21 @@ class Client:
             print("No question was asked")
             return None
 
-    def getScores(self):
+    def getScores(self): #returns a sorted list of scores.
         if self.newScores != None:
             return self.sortScores(self.newScores)
         else:
             print("No scores have been send")
             return None
 
-    def getYourScore(self):
+    def getYourScore(self): #returns your own score
         if self.newScores != None:
             return self.newScores.get(self.name)
         else:
             print("No scores have been send")
             return None
 
-    def getSolution(self):
+    def getSolution(self): #returns the correct answer to the last question you answered
         if self.newScores != None:
             return self.solution
         else:
@@ -387,7 +376,7 @@ class Client:
     def getEndMessage(self):
         return self.endMessage
 
-    def end(self):
+    def end(self): #close the connection
         self.server.close()
 
 
