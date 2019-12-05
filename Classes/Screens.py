@@ -24,7 +24,7 @@ class QuizApp(Tk):
 
     # switch screens
     def switchFrame(self, frameClass, *args):
-        # frame_class = any class that has been given as a parameter
+        # frameClass = any class that has been given as a parameter
         # assign self from QuizApp to frameClass
         if args:
             newFrame = frameClass(self, args)
@@ -482,7 +482,7 @@ class HostQuizScreen(BaseScreen):
 
     def next(self, quizId):
         # validation for ip address
-        if re.search("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", self.ip.get()) or self.ipValue.get() == "":
+        if re.search("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", self.ip.get()) or self.ip.get() == "":
             ip = self.ip.get()
             server = Server(ip, 5000)
             

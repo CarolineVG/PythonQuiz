@@ -63,6 +63,7 @@ class Server:
 
     def sendToClient(self, client, json):
         message = pickle.dumps(json)
+        print(message)
         message = bytes(f'{len(message):<{self.headerSize}}', "utf-8") + message
         try:
             client.send(message)
