@@ -1,5 +1,5 @@
 # PythonQuiz
-Quiz for the course Python
+Multiplayer Quiz over a network, made for the course Python
 
 ## dependencies
 In order to run this program you need to have the following modules installed:
